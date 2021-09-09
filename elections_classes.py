@@ -1,7 +1,9 @@
+from typing import Counter
 import numpy as np 
 import pandas as pd 
 import math
 import random
+import collections
 from elections_maps import *
 
 class Area:
@@ -9,6 +11,7 @@ class Area:
         self.name = name
         self.population = population            # todo: investigate to add population from file - may want to input as a series or tuples
         self.turnout = turnout
+        self.votes = []
         self.voters = []
         self.historical_vote_shares = []
 
@@ -55,12 +58,32 @@ class Area:
                       priority_axis=random.choices([-1,0,1],[1,4,1],k=1)[0]))         # todo: make voters not purely random
 
     def print_voters(self):
-        print(self.voters)
+        for i in self.voters:
+            print(i + "\n")
 
     def gen_voter_prefs(self, list_parties):
         for i in self.voters:
             i.gen_parties_dist(list_parties)
             i.order_parties()
+
+    def cast_votes(self, system):
+        for i in self.voters:
+            i.vote(system)
+
+    def tally_votes(self, system):
+        self.votes = []
+        for i in self.voters:
+            self.votes.append(i.vote_cast)
+        if system == "FPTP":
+            self.votes = set(Counter(self.votes))
+        else:
+            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+
+    def call_election(self, list_parties, system):
+        self.create_voters()
+        self.gen_voter_prefs(list_parties)
+        self.cast_votes(system)
+        self.tally_votes(system)
 
     # todo: allow areas to hold historical vote shares for parties
 
@@ -150,6 +173,8 @@ class Voter(Actor):
         Actor.__init__(self, name, lib_auth, left_right)
         self.priority_axis = priority_axis
         self.parties_dist = []
+        self.ordered_parties = []
+        self.vote_cast = []
 
     def __str__(self):
         return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, Priority: {priority_axis}""".format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right, priority_axis=map_priority_axes[self.priority_axis])
@@ -188,4 +213,10 @@ class Voter(Actor):
                     abs(self.left_right - (party).left_right)))
 
     def order_parties(self):
-        self.parties_dist.sort(key=lambda tup: tup[1])
+        self.ordered_parties = sorted(self.parties_dist, key=lambda tup: tup[1])
+
+    def vote(self, system):
+        if system == "FPTP":
+            self.vote_cast = self.ordered_parties[0][0]
+        else:
+            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
