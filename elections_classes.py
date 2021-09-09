@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd 
 import math
+from election-maps.py import *
 
 class Area:
     def __init__(self, name, population):
@@ -136,6 +137,7 @@ class Voter(Actor):
     def priority_axis(self, priority_axis):
         if priority_axis == -1 or priority_axis == 0 or priority_axis == 1:
             self._priority_axis = priority_axis
+            self.priority_axis_readable = map_priority_axes[priority_axis]
         else:
             raise ValueError("priority_axis can only be -1, 0 or 1")
 
