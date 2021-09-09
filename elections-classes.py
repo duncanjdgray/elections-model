@@ -3,9 +3,16 @@ import pandas as pd
 import math
 
 class Area:
-    def __init__(self, population):
+    def __init__(self, name, population):
+        self.name = name
         self.population = population            # todo: investigate to add population from file - may want to input as a series or tuples
-        self.voters = None
+        self.voters = []
+
+    def __str__(self):
+        return 'Area: {name}, Population: {population}, Voters: {voters}'.format(name=self.name, population=self.population, voters=len(self.voters))
+
+    def __repr__(self):
+        return 'Area(\'{name}\', {population})'.format(name=self.name, population=self.population)
 
     @property
     def population(self):
@@ -19,7 +26,7 @@ class Area:
             raise ValueError("population cannot be negative!")
 
     def create_voters(self):
-        self.voters = None                      # clear any existing list of voters
+        self.voters = []                        # clear any existing list of voters
         for i in math.ceil(self.population * self.turnout):
             self.voters.append(Voter())         # todo: add specifics of the voters I am adding here
 
@@ -31,6 +38,12 @@ class Constituency(Area):
     def __init__(self, population, turnout=1):
         Area.__init__(self, population)         # call Parent init
         self.turnout = turnout
+
+    def __str__(self):
+        return 'Area: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+
+    def __repr__(self):
+        return 'Area(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
 
     @property
     def turnout(self):
@@ -44,10 +57,17 @@ class Constituency(Area):
             raise ValueError("turnout must be between 0 and 1 inclusive!")
 
 class Actor:
-    def __init__(self, lib_auth=0, left_right=0):
+    def __init__(self, name, lib_auth=0, left_right=0):
         self.lib_auth = lib_auth
         self.left_right = left_right
-        
+        self.name = name
+
+    def __str__(self):
+        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}""".format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right)
+
+    def __repr__(self):
+        return 'Actor(\'{name}\', {lib_auth}, {left_right})'.format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right)
+
     @property
     def lib_auth(self):
         return self._lib_auth
@@ -71,9 +91,15 @@ class Actor:
             raise ValueError("left_right must be between -10 and 10 inclusive!")
 
 class Party(Actor):
-    def __init__(self, lib_auth=0, left_right=0, voteshare=0):
-        Actor.__init__(lib_auth, left_right)
+    def __init__(self, name, lib_auth=0, left_right=0, voteshare=0):
+        Actor.__init__(self, name, lib_auth, left_right)
         self.voteshare = voteshare
+
+    def __str__(self):
+        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, Vote share: {voteshare}%""".format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right, voteshare=self.voteshare*100)
+
+    def __repr__(self):
+        return 'Party(\'{name}\', {lib_auth}, {left_right}, {voteshare})'.format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right, voteshare=self.voteshare)
 
     @property
     def voteshare(self):
@@ -87,5 +113,49 @@ class Party(Actor):
             raise ValueError("voteshare must be between 0 and 1 inclusive!")
 
 class Voter(Actor):
-    def __init__(self, lib_auth=0, left_right=0):
-        Actor.__init__(lib_auth, left_right)
+    """
+        priority_axis will force voter to only care about one axis, not both.
+        -1 for lib_auth, 1 for left_right, 0 for both
+    """
+    def __init__(self, name, lib_auth=0, left_right=0, priority_axis=0):
+        Actor.__init__(self, name, lib_auth, left_right)
+        self.priority_axis = priority_axis
+        self.parties_dist = []
+
+    def __str__(self):
+        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, Priority: {priority_axis}""".format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right, priority_axis=map_priority_axes[self.priority_axis])
+
+    def __repr__(self):
+        return 'Actor(\'{name}\', {lib_auth}, {left_right}, {priority_axis})'.format(name=self.name, lib_auth=self.lib_auth, left_right=self.left_right, priority_axis=self.priority_axis)
+
+    @property
+    def priority_axis(self):
+        return self._priority_axis
+
+    @priority_axis.setter
+    def priority_axis(self, priority_axis):
+        if priority_axis == -1 or priority_axis == 0 or priority_axis == 1:
+            self._priority_axis = priority_axis
+        else:
+            raise ValueError("priority_axis can only be -1, 0 or 1")
+
+    def gen_parties_dist(self, list_parties):
+        self.parties_dist = []            # Empty existing list
+        for party in list_parties:
+            if self.priority_axis == 0:
+                self.parties_dist.append( \
+                    ((party).name, \
+                    math.sqrt( \
+                        (self.lib_auth - (party).lib_auth)**2 + 
+                        (self.left_right - (party).left_right)**2)))
+            elif self.priority_axis == -1:
+                self.parties_dist.append( \
+                    ((party).name, \
+                    abs(self.lib_auth - (party).lib_auth)))
+            elif self.priority_axis == 1:
+                self.parties_dist.append( \
+                    ((party).name, \
+                    abs(self.left_right - (party).left_right)))
+
+    def order_parties(self):
+        self.parties_dist.sort(key=lambda tup: tup[1])
