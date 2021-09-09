@@ -1,7 +1,7 @@
 import numpy as np 
 import pandas as pd 
 import math
-import elections_maps
+from elections_maps import *
 
 class Area:
     def __init__(self, name, population):
