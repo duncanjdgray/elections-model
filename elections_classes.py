@@ -47,7 +47,7 @@ class Area:
 
     def create_voters(self):
         self.voters = []                        # clear any existing list of voters
-        for i in math.ceil(self.population * self.turnout):
+        for i in range(0,math.ceil(self.population * self.turnout)):
             self.voters.append(
                 Voter(name=str(i),
                       lib_auth=random.uniform(-10,10),
