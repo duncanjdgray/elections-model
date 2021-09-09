@@ -1,19 +1,22 @@
 import numpy as np 
 import pandas as pd 
 import math
+import random
 from elections_maps import *
 
 class Area:
-    def __init__(self, name, population):
+    def __init__(self, name, population, turnout=1):
         self.name = name
         self.population = population            # todo: investigate to add population from file - may want to input as a series or tuples
+        self.turnout = turnout
         self.voters = []
+        self.historical_vote_shares = []
 
     def __str__(self):
         return 'Area: {name}, Population: {population}, Voters: {voters}'.format(name=self.name, population=self.population, voters=len(self.voters))
 
     def __repr__(self):
-        return 'Area(\'{name}\', {population})'.format(name=self.name, population=self.population)
+        return 'Area(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
 
     @property
     def population(self):
@@ -26,10 +29,30 @@ class Area:
         else:
             raise ValueError("population cannot be negative!")
 
+    @property
+    def turnout(self):
+        return self._turnout
+
+    @turnout.setter
+    def turnout(self, turnout):   
+        if turnout >=0 and turnout <=1:         # todo: add fuzz around a national turnout input
+            self._turnout = turnout
+        else:
+            raise ValueError("turnout must be between 0 and 1 inclusive!")
+
+    def input_hist_shares(self, list_parties, list_shares):
+        self.historical_vote_shares = []
+        for i in len(list_parties):
+            self.historical_vote_shares.append([list_parties[i].name, list_shares[i]])
+
     def create_voters(self):
         self.voters = []                        # clear any existing list of voters
         for i in math.ceil(self.population * self.turnout):
-            self.voters.append(Voter())         # todo: add specifics of the voters I am adding here
+            self.voters.append(
+                Voter(name=str(i),
+                      lib_auth=random.uniform(-10,10),
+                      left_right=random.uniform(-10,10),
+                      priority_axis=random.choices([-1,0,1],[1,4,1],k=1)[0]))         # todo: make voters not purely random
 
     def print_voters(self):
         print(self.voters)
@@ -39,28 +62,28 @@ class Area:
             i.gen_parties_dist(list_parties)
             i.order_parties()
 
+    # todo: allow areas to hold historical vote shares for parties
 
 class Constituency(Area):
-    def __init__(self, population, turnout=1):
-        Area.__init__(self, population)         # call Parent init
-        self.turnout = turnout
+    def __init__(self, name, population, turnout=1):
+        Area.__init__(self, name, population, turnout)
 
     def __str__(self):
         return 'Area: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
 
     def __repr__(self):
-        return 'Area(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+        return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
 
-    @property
-    def turnout(self):
-        return self._turnout
+class LocalAuthority(Area):
+    def __init__(self, name, population, turnout=1):
+        Area.__init__(self, name, population, turnout)
 
-    @turnout.setter
-    def turnout(self, turnout):   
-        if turnout >=0 and turnout <=1:         # todo: add fuzz around a national turnout input
-            self.turnout = turnout
-        else:
-            raise ValueError("turnout must be between 0 and 1 inclusive!")
+    def __str__(self):
+        return 'Area: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+
+    def __repr__(self):
+        return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+
 
 class Actor:
     def __init__(self, name, lib_auth=0, left_right=0):
