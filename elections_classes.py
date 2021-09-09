@@ -1,7 +1,7 @@
 import numpy as np 
 import pandas as pd 
 import math
-from election-maps.py import *
+import elections_maps
 
 class Area:
     def __init__(self, name, population):
@@ -33,6 +33,11 @@ class Area:
 
     def print_voters(self):
         print(self.voters)
+
+    def gen_voter_prefs(self, list_parties):
+        for i in self.voters:
+            i.gen_parties_dist(list_parties)
+            i.order_parties()
 
 
 class Constituency(Area):
