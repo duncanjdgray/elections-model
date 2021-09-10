@@ -12,8 +12,6 @@ fptp_parties_scot = ["Conservatives", "Labour", "Liberal Democrats", "Green", "S
 fptp_parties_wal = ["Conservatives", "Labour", "Liberal Democrats", "Green", "Plaid Cymru"]
 fptp_parties_ni = ["DUP", "SDLP", "Alliance", "UUP", "Sinn Féin"]
 
-
-
 # map wards to constituencies and constituencies to local authorities
 ward_con_la = pd.DataFrame(pd.read_csv("data/map_ward_con_la.csv"))
 map_ward_con = pd.Series(ward_con_la['PCON18NM'].values,index=ward_con_la['WD18NM']).to_dict()

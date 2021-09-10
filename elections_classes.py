@@ -1,10 +1,10 @@
-from collections import Counter
 import numpy as np 
 import pandas as pd 
 import math
 import random
 from elections_maps import *
 
+# %% Area-based classes
 class Area:
     def __init__(self, name, population, turnout=1):
         self.name = name
@@ -125,7 +125,7 @@ class LocalAuthority(Area):
     def __repr__(self):
         return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
 
-
+# %% Actor-based classes
 class Actor:
     def __init__(self, name, lib_auth=0, left_right=0):
         self.lib_auth = lib_auth

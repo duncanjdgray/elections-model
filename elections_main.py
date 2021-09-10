@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd 
 import elections_classes as ec
 
+# import source data
+data_popn_by_ward = pd.DataFrame(pd.read_csv("data/data_popn_by_ward.csv"))
+
 # Test code for setting up one area
 here = ec.Area("Treyarnon",10,0.7)
 
