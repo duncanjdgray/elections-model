@@ -3,9 +3,10 @@ import pandas as pd
 import math
 
 # map of priority axes to human-readable
-map_priority_axes = {-1: "Lib-Auth",
-                     0: "No priority axis",
-                     1: "Left-Right"}
+map_priority_axes = {0: "No priority axis",
+                     1: "Left-Right",
+                     2: "Lib-Auth",
+                     3: "Remain-Leave"}
 
 fptp_parties_eng = ["Conservatives", "Labour", "Liberal Democrats", "Green", "Reform UK"]
 fptp_parties_scot = ["Conservatives", "Labour", "Liberal Democrats", "Green", "SNP"]
