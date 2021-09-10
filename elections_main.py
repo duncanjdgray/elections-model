@@ -13,4 +13,6 @@ ukip = ec.Party("UKIP", 8, 10, 0.05)
 parties = [lab,con,lib,ukip]
 
 here.call_election(parties,"FPTP")
-here.votes
+print(here.votes)
+print(here.winner)
+here.declare_winner("FPTP")

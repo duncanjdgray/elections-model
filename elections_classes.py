@@ -1,9 +1,8 @@
-from typing import Counter
+from collections import Counter
 import numpy as np 
 import pandas as pd 
 import math
 import random
-import collections
 from elections_maps import *
 
 class Area:
@@ -13,6 +12,7 @@ class Area:
         self.turnout = turnout
         self.votes = []
         self.voters = []
+        self.winner = []
         self.historical_vote_shares = []
 
     def __str__(self):
@@ -75,15 +75,33 @@ class Area:
         for i in self.voters:
             self.votes.append(i.vote_cast)
         if system == "FPTP":
-            self.votes = set(Counter(self.votes))
+            self.votes = [(x,self.votes.count(x)) for x in set(self.votes)]
+            self._votes_sorted = sorted(self.votes, reverse=True, key=lambda tup: tup[1])
         else:
             raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+
+    def decide_winner(self, system):
+        if system == "FPTP":
+            self.winner = self._votes_sorted[0][0]
+        else:
+            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+
+    def declare_winner(self, system):
+        self.decide_winner(system)
+        if system == "FPTP":
+            print("The winner in " + self.name + " is " + self.winner + " with " + str(self._votes_sorted[0][1]) + \
+                    " votes, beating the next closest party " + self._votes_sorted[1][0] + " which got " + \
+                    str(self._votes_sorted[1][1]) + " votes.")
+        else:
+            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+
 
     def call_election(self, list_parties, system):
         self.create_voters()
         self.gen_voter_prefs(list_parties)
         self.cast_votes(system)
         self.tally_votes(system)
+        self.decide_winner(system)
 
     # todo: allow areas to hold historical vote shares for parties
 
@@ -217,6 +235,7 @@ class Voter(Actor):
 
     def vote(self, system):
         if system == "FPTP":
-            self.vote_cast = self.ordered_parties[0][0]
+            self.vote_cast = self.ordered_parties[0][0] # vote for nearest party
+            # todo: allow tactical voting?
         else:
             raise ValueError("system not set to recognised value. Recognised values are: FPTP")
