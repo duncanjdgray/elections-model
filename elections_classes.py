@@ -55,7 +55,8 @@ class Area:
                 Voter(name=str(i),
                       lib_auth=random.uniform(-10,10),
                       left_right=random.uniform(-10,10),
-                      priority_axis=random.choices([-1,0,1],[1,4,1],k=1)[0]))         # todo: make voters not purely random
+                      rem_leave=random.uniform(-10,10),
+                      priority_axis=random.choices([0,1,2,3],[5,1,1,2],k=1)[0]))         # todo: make voters not purely random
 
     def print_voters(self):
         for i in self.voters:
