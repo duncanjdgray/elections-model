@@ -121,33 +121,6 @@ class Area:
 
     # todo: allow areas to hold historical vote shares for parties
 
-class Constituency(Area):
-    # todo: write docstrings
-
-    def __init__(self, name, population, turnout=1):
-        Area.__init__(self, name, population, turnout)
-
-    def __str__(self):
-        return 'Constituency: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
-
-    def __repr__(self):
-        return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
-
-    def set_party_voteshares(self, parties):
-        self.parties_voteshares = [x.voteshare for x in parties]
-
-class LocalAuthority(Area):
-    # todo: write docstrings
-    
-    def __init__(self, name, population, turnout=1):
-        Area.__init__(self, name, population, turnout)
-
-    def __str__(self):
-        return 'Local Authority: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
-
-    def __repr__(self):
-        return 'LocalAuthority(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
-
 class Country(Area):
     # todo: write docstrings
 
@@ -171,6 +144,79 @@ class Country(Area):
             self._parties = parties
         else:
             raise TypeError("all elements of parties must be Party-type objects!")
+
+class LocalAuthority(Area):
+    # todo: write docstrings
+    
+    def __init__(self, name, population, country, turnout=1):
+        Area.__init__(self, name, population, turnout)
+        self.country = country
+
+    def __str__(self):
+        return 'Local Authority: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+
+    def __repr__(self):
+        return 'LocalAuthority(\'{name}\', {population}, {parties}, {turnout})'.format(name=self.name, population=self.population, parties=self.parties, turnout=self.turnout)
+
+    @property
+    def country(self):
+        return self._country
+    
+    @country.setter
+    def country(self, country):
+        if type(country, Country):
+            self._country = country
+        else:
+            raise ValueError("country must be a Country-type object!")
+
+class Constituency(Area):
+    # todo: write docstrings
+
+    def __init__(self, name, population, localauthority, turnout=1):
+        Area.__init__(self, name, population, turnout)
+        self.la = localauthority
+
+    def __str__(self):
+        return 'Constituency: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+
+    def __repr__(self):
+        return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+
+    @property
+    def la(self):
+        return self._la
+    
+    @la.setter
+    def la(self, localauthority):
+        if type(localauthority, LocalAuthority):
+            self._la = localauthority
+        else:
+            raise ValueError("localauthority must be a LocalAuthority-type object!")
+
+class Ward(Area):
+    # todo: write docstrings
+
+    def __init__(self, name, population, constituency, turnout=1):
+        Area.__init__(self, name, population, turnout)
+        self.cons = constituency
+
+    def __str__(self):
+        return """Ward: {name}, part of the {constituency} constituency. 
+        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(name=self.name, constituency=self.cons, population=self.population, turnout=self.turnout, voters=len(self.voters))
+
+    def __repr__(self):
+        return 'Ward(\'{name}\', {population}, {constituency}, {turnout})'.format(name=self.name, population=self.population, constituency=self.cons, turnout=self.turnout)
+
+    @property
+    def cons(self):
+        return self._cons
+    
+    @cons.setter
+    def cons(self, constituency):
+        if type(constituency, Constituency):
+            self._cons = constituency
+        else:
+            raise ValueError("constituency must be a Constituency-type object!")
 
 # %% Actor-based classes
 class Actor:
