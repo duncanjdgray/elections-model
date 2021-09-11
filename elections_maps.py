@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd 
 import math
+import elections_classes as ec
 
 # map of priority axes to human-readable
 map_priority_axes = {0: "No priority axis",
@@ -8,10 +9,6 @@ map_priority_axes = {0: "No priority axis",
                      2: "Lib-Auth",
                      3: "Remain-Leave"}
 
-fptp_parties_eng = ["Conservatives", "Labour", "Liberal Democrats", "Green", "Reform UK"]
-fptp_parties_scot = ["Conservatives", "Labour", "Liberal Democrats", "Green", "SNP"]
-fptp_parties_wal = ["Conservatives", "Labour", "Liberal Democrats", "Green", "Plaid Cymru"]
-fptp_parties_ni = ["DUP", "SDLP", "Alliance", "UUP", "Sinn Féin"]
 
 # map wards to constituencies and constituencies to local authorities
 ward_con_la = pd.DataFrame(pd.read_csv("data/map_ward_con_la.csv"))

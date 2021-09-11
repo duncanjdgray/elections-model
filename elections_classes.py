@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 import random as rnd
 import math
-from elections_maps import *
+from elections_maps import map_priority_axes
 
 # %% Area-based classes
 class Area:
