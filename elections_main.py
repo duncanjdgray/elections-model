@@ -45,6 +45,14 @@ dict_wards = dict()
 for ward in list_ward:
     dict_wards[ward] = ec.Ward(ward, 0, dict_constituencies[map_ward_con[ward]], dict_constituencies[map_ward_con[ward]].parties)
 
+# add populations
+voting_ages = [str(x) for x in range(min_voter_age,90)]
+voting_ages.append('90+')
+data_popn_by_ward['voting_popn'] = data_popn_by_ward[voting_ages].apply(pd.to_numeric).sum(axis=1)
+
+for ward in list_ward:
+    dict_wards[ward].population = pass
+
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
 # done in inputs - Define national lists of parties (lists in _maps.py)

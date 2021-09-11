@@ -1,5 +1,8 @@
 import elections_classes as ec
 
+# minimum voting age
+min_voter_age = 18
+
 # initialise parties using data from https://www.politicalcompass.org/uk2019 plus some guesswork for rem/leave and northern ireland
 # scale factors represent how broad a church the party is on that axis - higher = broader. 
 p_con = ec.Party(name="Conservatives", 
@@ -100,9 +103,6 @@ p_sdlp.voteshare = 0.17
 p_all.voteshare = 0.17
 p_uup.voteshare = 0.13
 p_sf.voteshare = 0.26
-
-# set of countries
-country_names = {"england", "scotland", "wales", "northern ireland"}
 
 # sets of parties
 fptp_parties = {p_con, p_lab, p_lib, p_grn, p_bxp, p_snp, p_plaid, p_dup, p_sdlp, p_all, p_uup, p_sf}
