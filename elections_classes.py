@@ -50,9 +50,12 @@ class Area:
         for i in len(list_parties):
             self.historical_vote_shares.append([list_parties[i].name, list_shares[i]])
 
+    def set_party_voteshares(self, parties):
+        self.parties_voteshares = [x.voteshare for x in parties]
+
     def create_voters(self, parties):
         self.voters = []
-        self.parties_voteshares = [x.voteshare for x in parties]
+        self.set_party_voteshares()
         for i in range(0, 10):
             rnd_party = rnd.choices(parties, self.parties_voteshares, k=1)
             rnd_lib_auth, rnd_left_right, rnd_rem_leave = -11, -11, -11             # set arguments out of bounds so while loops run at least once
@@ -129,6 +132,9 @@ class Constituency(Area):
 
     def __repr__(self):
         return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+
+    def set_party_voteshares(self, parties):
+        self.parties_voteshares = [x.voteshare for x in parties]
 
 class LocalAuthority(Area):
     # todo: write docstrings
