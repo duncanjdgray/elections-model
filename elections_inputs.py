@@ -102,7 +102,7 @@ p_uup.voteshare = 0.13
 p_sf.voteshare = 0.26
 
 # set of countries
-country_names = {"England", "Scotland", "Wales", "Northern Ireland"}
+country_names = {"england", "scotland", "wales", "northern ireland"}
 
 # sets of parties
 fptp_parties = {p_con, p_lab, p_lib, p_grn, p_bxp, p_snp, p_plaid, p_dup, p_sdlp, p_all, p_uup, p_sf}
@@ -112,7 +112,7 @@ fptp_parties_wal = {p_con, p_lab, p_lib, p_grn, p_plaid}
 fptp_parties_ni = {p_dup, p_sdlp, p_all, p_uup, p_sf}
 
 # map country name to party set
-map_country_parties = {"England" : fptp_parties_eng,
-                        "Scotland" : fptp_parties_scot,
-                        "Wales" : fptp_parties_wal,
-                        "Northern Ireland" : fptp_parties_ni}
+map_country_parties = {"england" : fptp_parties_eng,
+                        "scotland" : fptp_parties_scot,
+                        "wales" : fptp_parties_wal,
+                        "northern ireland" : fptp_parties_ni}

@@ -29,21 +29,29 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
 # create Areas
 uk = ec.Nation("United Kingdom",0)
 
-countries = []
-for country in country_names:
-    countries.append(ec.Country(country, 0, uk, map_country_parties[country]))
+dict_countries = dict()
+for country in list_country:
+    dict_countries[country] = ec.Country(country, 0, uk, map_country_parties[country])
 
-local_authorities = []
-for la in map_con_la.values().unique():
-    local_authorities.append(ec.LocalAuthority(la, 0, ))
+dict_localauthorities = dict()
+for la in list_la:
+    dict_localauthorities[la] = ec.LocalAuthority(la, 0, dict_countries[map_la_country[la]], dict_countries[map_la_country[la]].parties)
+
+dict_constituencies = dict()
+for con in list_con:
+    dict_constituencies[con] = ec.Constituency(con, 0, dict_localauthorities[map_con_la[con]], dict_localauthorities[map_con_la[con]].parties)
+
+dict_wards = dict()
+for ward in list_ward:
+    dict_wards[ward] = ec.Ward(ward, 0, dict_constituencies[map_ward_con[ward]], dict_constituencies[map_ward_con[ward]].parties)
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
 # done in inputs - Define national lists of parties (lists in _maps.py)
-# todo: Create countries, for each country give it a subset of all parties
-# todo: For each country, create a set of LAs
-# todo: For each LA, create a set of Cons
-# todo: For each Cons, create a set of Wards
+# done - Create countries, for each country give it a subset of all parties
+# done - For each country, create a set of LAs
+# done - For each LA, create a set of Cons
+# done - For each Cons, create a set of Wards
 # todo: Give each Ward a population
 # todo: For each Cons, sum its Wards' popn
 # todo: Repeat for LAs and Countries

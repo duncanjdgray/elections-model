@@ -30,6 +30,9 @@ ge_results_constituencies = pd.DataFrame(data=ge_results_2019_long.index.get_lev
 ge_results_constituencies["in_map"] = ge_results_constituencies['constituency'].isin(map_con_la)
 ge_results_constituencies["in_map"].describe()
 
+test_la = pd.DataFrame(list_la)
+test_la['check'] = test_la[0].isin(map_la_country)
+
 # Test code for setting up one area
 
 lab = ec.Party("Labour", -2, -6, -5, 0.3)
