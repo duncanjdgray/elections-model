@@ -8,9 +8,10 @@ from elections_maps import *
 class Area:
     # todo: write docstring
     
-    def __init__(self, name, population, turnout=1):
+    def __init__(self, name, population, parties=[], turnout=1):
         self.name = name
         self.population = population            # todo: investigate to add population from file - may want to input as a series or tuples
+        self.parties = parties
         self.turnout = turnout
         self.votes = []
         self.voters = []
@@ -18,10 +19,19 @@ class Area:
         self.historical_vote_shares = []
 
     def __str__(self):
-        return 'Area: {name}, Population: {population}, Voters: {voters}'.format(name=self.name, population=self.population, voters=len(self.voters))
+        return """Area: {name}, Population: {population}, Voters: {voters}
+        Parties: {parties}""".format(
+            name=self.name, 
+            population=self.population, 
+            voters=len(self.voters),
+            parties=[x.name for x in self.parties])
 
     def __repr__(self):
-        return 'Area(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+        return 'Area(\'{name}\', {population}, {parties}, {turnout})'.format(
+            name=self.name, 
+            population=self.population, 
+            parties=self.parties,
+            turnout=self.turnout)
 
     @property
     def population(self):
@@ -33,6 +43,17 @@ class Area:
             self._population = population
         else:
             raise ValueError("population cannot be negative!")
+
+    @property
+    def parties(self):
+        return self._parties
+
+    @parties.setter
+    def parties(self, parties):   
+        if all(isinstance(x, Party) for x in parties):
+            self._parties = parties
+        else:
+            raise TypeError("all elements of parties must be Party-type objects!")
 
     @property
     def turnout(self):
@@ -111,7 +132,6 @@ class Area:
         else:
             raise ValueError("system not set to recognised value. Recognised values are: FPTP")
 
-
     def call_election(self, list_parties, system):
         self.create_voters(list_parties)
         self.gen_voter_prefs(list_parties)
@@ -125,8 +145,7 @@ class Country(Area):
     # todo: write docstrings
 
     def __init__(self, name, population, parties=[], turnout=1):
-        Area.__init__(self, name, population, turnout)
-        self.parties = parties
+        Area.__init__(self, name, population, parties, turnout)
 
     def __str__(self):
         return """Country: {name}, Population: {population}, Turnout: {turnout}%, 
@@ -143,22 +162,11 @@ class Country(Area):
             parties=self.parties, 
             turnout=self.turnout)
 
-    @property
-    def parties(self):
-        return self._parties
-
-    @parties.setter
-    def parties(self, parties):   
-        if all(isinstance(x, Party) for x in parties):
-            self._parties = parties
-        else:
-            raise TypeError("all elements of parties must be Party-type objects!")
-
 class LocalAuthority(Area):
     # todo: write docstrings
     
-    def __init__(self, name, population, country, turnout=1):
-        Area.__init__(self, name, population, turnout)
+    def __init__(self, name, population, country, parties=[], turnout=1):
+        Area.__init__(self, name, population, parties, turnout)
         self.country = country
 
     def __str__(self):
@@ -171,10 +179,11 @@ class LocalAuthority(Area):
             voters=len(self.voters))
 
     def __repr__(self):
-        return 'LocalAuthority(\'{name}\', {population}, {country}, {turnout})'.format(
+        return 'LocalAuthority(\'{name}\', {population}, {country}, {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
             country=self.country, 
+            parties=self.parties,
             turnout=self.turnout)
 
     @property
@@ -191,8 +200,8 @@ class LocalAuthority(Area):
 class Constituency(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, localauthority, turnout=1):
-        Area.__init__(self, name, population, turnout)
+    def __init__(self, name, population, localauthority, parties=[], turnout=1):
+        Area.__init__(self, name, population, parties, turnout)
         self.la = localauthority
 
     def __str__(self):
@@ -205,10 +214,11 @@ class Constituency(Area):
             voters=len(self.voters))
 
     def __repr__(self):
-        return 'Constituency(\'{name}\', {population}, {localauthority}, {turnout})'.format(
+        return 'Constituency(\'{name}\', {population}, {localauthority}, {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
-            localauthority=self.la, 
+            localauthority=self.la,
+            parties=self.parties,
             turnout=self.turnout)
 
     @property
@@ -225,8 +235,8 @@ class Constituency(Area):
 class Ward(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, constituency, turnout=1):
-        Area.__init__(self, name, population, turnout)
+    def __init__(self, name, population, constituency, parties=[], turnout=1):
+        Area.__init__(self, name, population, parties, turnout)
         self.cons = constituency
 
     def __str__(self):
@@ -239,10 +249,11 @@ class Ward(Area):
             voters=len(self.voters))
 
     def __repr__(self):
-        return 'Ward(\'{name}\', {population}, {constituency}, {turnout})'.format(
+        return 'Ward(\'{name}\', {population}, {constituency}, {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
             constituency=self.cons, 
+            parties=self.parties,
             turnout=self.turnout)
 
     @property
