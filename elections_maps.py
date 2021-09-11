@@ -1,7 +1,4 @@
-import numpy as np 
 import pandas as pd 
-import math
-import elections_classes as ec
 
 # map of priority axes to human-readable
 map_priority_axes = {0: "No priority axis",
@@ -9,9 +6,10 @@ map_priority_axes = {0: "No priority axis",
                      2: "Lib-Auth",
                      3: "Remain-Leave"}
 
-
 # map wards to constituencies and constituencies to local authorities
-ward_con_la = pd.DataFrame(pd.read_csv("data/map_ward_con_la.csv")).apply(lambda x: x.astype(str).str.lower())
+ward_con_la = pd.DataFrame(pd.read_csv("data/map_ward_con_la.csv")) \
+    .apply(lambda x: x.astype(str).str.lower()) \
+    .apply(lambda x: x.astype(str).str.replace("ô", "o"))       # 'ynys môn' causes problems with matching
 map_ward_con = pd.Series(ward_con_la['PCON18NM'].values,index=ward_con_la['WD18NM']).to_dict()
 map_con_la = pd.Series(ward_con_la['LAD18NM'].values,index=ward_con_la['PCON18NM']).to_dict()
 

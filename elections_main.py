@@ -25,6 +25,10 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
                                         j="party",
                                         suffix=r'\w+')
 
+# create Areas
+uk = ec.Nation("United Kingdom",0)
+
+
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
 # done in inputs - Define national lists of parties (lists in _maps.py)

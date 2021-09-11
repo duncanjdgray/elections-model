@@ -80,9 +80,9 @@ p_uup = ec.Party(name="Ulster Unionists",   # basically diet tories?
                 rem_leave= 4,
                 scale_rl= 1.5)
 p_sf = ec.Party(name="Sinn Féin",           # honestly I just don't know
-                lib_auth= 4, 
+                lib_auth= 5, 
                 scale_la= 1.5,
-                left_right= -4, 
+                left_right= -7, 
                 scale_lr= 1.5,
                 rem_leave= -5,
                 scale_rl= 1.5)

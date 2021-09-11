@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import random as rnd
 import elections_classes as ec
+from elections_maps import *
 
 # import source data
 data_popn_by_ward = pd.DataFrame(pd.read_csv("data/data_popn_by_ward.csv")).apply(lambda x: x.astype(str).str.lower())
@@ -25,7 +26,9 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
                                         j="party",
                                         suffix=r'\w+')
 
-ge_results_constituencies = pd.DataFrame(data=ge_results_2019_long.index.get_level_values(0).unique().values)
+ge_results_constituencies = pd.DataFrame(data=ge_results_2019_long.index.get_level_values(0).unique().values, columns=["constituency"])
+ge_results_constituencies["in_map"] = ge_results_constituencies['constituency'].isin(map_con_la)
+ge_results_constituencies["in_map"].describe()
 
 # Test code for setting up one area
 
