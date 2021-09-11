@@ -129,10 +129,19 @@ class Country(Area):
         self.parties = parties
 
     def __str__(self):
-        return 'Country: {name}, Population: {population}, Turnout: {turnout}, Parties: {parties}'.format(name=self.name, population=self.population, turnout=self.turnout, parties=self.parties)
+        return """Country: {name}, Population: {population}, Turnout: {turnout}%, 
+        Parties: {parties}""".format(
+            name=self.name, 
+            population=self.population, 
+            turnout=self.turnout*100, 
+            parties=[x.name for x in self.parties])
 
     def __repr__(self):
-        return 'Country(\'{name}\', {population}, {parties}, {turnout})'.format(name=self.name, population=self.population, parties=self.parties, turnout=self.turnout)
+        return 'Country(\'{name}\', {population}, {parties}, {turnout})'.format(
+            name=self.name, 
+            population=self.population, 
+            parties=self.parties, 
+            turnout=self.turnout)
 
     @property
     def parties(self):
@@ -154,11 +163,11 @@ class LocalAuthority(Area):
 
     def __str__(self):
         return """Local Authority: {name}, part of {country}.
-        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(
+        Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
-            country=self.country, 
+            country=self.country.name, 
             population=self.population, 
-            turnout=self.turnout, 
+            turnout=self.turnout*100, 
             voters=len(self.voters))
 
     def __repr__(self):
@@ -174,7 +183,7 @@ class LocalAuthority(Area):
     
     @country.setter
     def country(self, country):
-        if type(country, Country):
+        if isinstance(country, Country):
             self._country = country
         else:
             raise ValueError("country must be a Country-type object!")
@@ -188,11 +197,11 @@ class Constituency(Area):
 
     def __str__(self):
         return """Constituency: {name}, part of the {localauthority} local authority. 
-        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(
+        Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
-            localauthority=self.la, 
+            localauthority=self.la.name, 
             population=self.population, 
-            turnout=self.turnout, 
+            turnout=self.turnout*100, 
             voters=len(self.voters))
 
     def __repr__(self):
@@ -208,7 +217,7 @@ class Constituency(Area):
     
     @la.setter
     def la(self, localauthority):
-        if type(localauthority, LocalAuthority):
+        if isinstance(localauthority, LocalAuthority):
             self._la = localauthority
         else:
             raise ValueError("localauthority must be a LocalAuthority-type object!")
@@ -222,11 +231,11 @@ class Ward(Area):
 
     def __str__(self):
         return """Ward: {name}, part of the {constituency} constituency. 
-        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(
+        Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
-            constituency=self.cons, 
+            constituency=self.cons.name, 
             population=self.population, 
-            turnout=self.turnout, 
+            turnout=self.turnout*100, 
             voters=len(self.voters))
 
     def __repr__(self):
@@ -242,7 +251,7 @@ class Ward(Area):
     
     @cons.setter
     def cons(self, constituency):
-        if type(constituency, Constituency):
+        if isinstance(constituency, Constituency):
             self._cons = constituency
         else:
             raise ValueError("constituency must be a Constituency-type object!")
@@ -315,8 +324,8 @@ class Party(Actor):
         self.scale_rl = scale_rl
 
     def __str__(self):
-        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, \
-            Remain-Leave: {rem_leave}, Vote share: {voteshare}%""".format(
+        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right},
+        Remain-Leave: {rem_leave}, Vote share: {voteshare}%""".format(
                 name=self.name, 
                 lib_auth=self.lib_auth, 
                 left_right=self.left_right, 
@@ -347,34 +356,34 @@ class Party(Actor):
 
     @property
     def scale_la(self):
-        return self.scale_la
+        return self._scale_la
 
     @scale_la.setter
     def scale_la(self, scale_la):
         if scale_la >= 0 and scale_la <= 5:
-            self.scale_la = scale_la
+            self._scale_la = scale_la
         else:
             raise ValueError("scale_la must be between 0 and 5 inclusive!")
 
     @property
     def scale_lr(self):
-        return self.scale_lr
+        return self._scale_lr
 
     @scale_lr.setter
     def scale_lr(self, scale_lr):
         if scale_lr >= 0 and scale_lr <= 5:
-            self.scale_lr = scale_lr
+            self._scale_lr = scale_lr
         else:
             raise ValueError("scale_lr must be between 0 and 5 inclusive!")
 
     @property
     def scale_rl(self):
-        return self.scale_rl
+        return self._scale_rl
 
     @scale_rl.setter
     def scale_rl(self, scale_rl):
         if scale_rl >= 0 and scale_rl <= 5:
-            self.scale_rl = scale_rl
+            self._scale_rl = scale_rl
         else:
             raise ValueError("scale_rl must be between 0 and 5 inclusive!")
 
