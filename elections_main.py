@@ -53,10 +53,27 @@ dict_ward_popn = data_popn_by_ward.set_index('Ward Name 1').to_dict()['voting_po
 
 for ward in dict_wards.values():
     try: 
-        dict_wards[ward.name].population = dict_ward_popn[ward.name]
+        ward.population = dict_ward_popn[ward.name]
     except KeyError:
-        dict_wards[ward.name].population = data_popn_by_ward['voting_popn'].mean()
+        ward.population = data_popn_by_ward['voting_popn'].mean()
 
+for con in dict_constituencies.values():
+    con.population = 0
+    wardlist = [x for x in dict_wards.values() if x.cons == con]
+    for ward in wardlist:
+        con.population += ward.population
+
+for la in dict_localauthorities.values():
+    la.population = 0
+    conlist = [x for x in dict_constituencies.values() if x.la == la]
+    for con in conlist:
+        la.population += con.population
+
+for country in dict_countries.values():
+    country.population = 0
+    lalist = [x for x in dict_localauthorities.values() if x.country == country]
+    for la in lalist:
+        country.population += la.population
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
@@ -65,7 +82,7 @@ for ward in dict_wards.values():
 # done - For each country, create a set of LAs
 # done - For each LA, create a set of Cons
 # done - For each Cons, create a set of Wards
-# todo: Give each Ward a population
+# done -  Give each Ward a population
 # todo: For each Cons, sum its Wards' popn
 # todo: Repeat for LAs and Countries
 # todo: Give each Cons a historic voteshare for each of its parties
