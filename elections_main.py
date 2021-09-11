@@ -49,9 +49,14 @@ for ward in list_ward:
 voting_ages = [str(x) for x in range(min_voter_age,90)]
 voting_ages.append('90+')
 data_popn_by_ward['voting_popn'] = data_popn_by_ward[voting_ages].apply(pd.to_numeric).sum(axis=1)
+dict_ward_popn = data_popn_by_ward.set_index('Ward Name 1').to_dict()['voting_popn']
 
-for ward in list_ward:
-    dict_wards[ward].population = pass
+for ward in dict_wards.values():
+    try: 
+        dict_wards[ward.name].population = dict_ward_popn[ward.name]
+    except KeyError:
+        dict_wards[ward.name].population = data_popn_by_ward['voting_popn'].mean()
+
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
