@@ -8,7 +8,6 @@ data_popn_by_ward = pd.DataFrame(pd.read_csv("data/data_popn_by_ward.csv"))
 data_eu_ref_by_con = pd.DataFrame(pd.read_csv("data/data_eu_ref_by_con.csv"))
 
 # Test code for setting up one area
-here = ec.Area("Treyarnon", 10, 0.7)
 
 lab = ec.Party("Labour", -2, -6, -5, 0.3)
 con = ec.Party("Conservatives", 3, 8, 9, 0.4)
@@ -17,21 +16,25 @@ ukip = ec.Party("UKIP", 8, 10, 10, 0.05)
 
 parties = [lab, con, lib, ukip]
 
+here = ec.Area("Treyarnon", 10, parties, 0.7)
+
 # here.call_election(parties,"FPTP")
 # print(here.votes)
 # print(here.winner)
 # here.declare_winner("FPTP")
 
 # testing setting up various tiers of area
-eng = ec.Country("England", 100, parties)
-corn = ec.LocalAuthority("Cornwall", 25, eng)
-pad = ec.Constituency("Padstow", 10, corn)
-trey = ec.Ward("Treyarnon", 5, pad)
+uk = ec.Nation("UK", 150, parties)
+eng = ec.Country("England", 100, uk, parties)
+corn = ec.LocalAuthority("Cornwall", 25, eng, uk.parties)
+pad = ec.Constituency("Padstow", 10, corn, corn.parties)
+trey = ec.Ward("Treyarnon", 5, pad, pad.parties)
 
 print(trey)
 print(pad)
 print(corn)
 print(eng)
+print(uk)
 
 
 # Order of precedence:

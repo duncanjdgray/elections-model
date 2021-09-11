@@ -140,8 +140,7 @@ class Area:
         self.decide_winner(system)
 
     # todo: allow areas to hold historical vote shares for parties
-
-class Country(Area):
+class Nation(Area):
     # todo: write docstrings
 
     def __init__(self, name, population, parties=[], turnout=1):
@@ -161,6 +160,43 @@ class Country(Area):
             population=self.population, 
             parties=self.parties, 
             turnout=self.turnout)
+
+class Country(Area):
+    # todo: write docstrings
+
+    def __init__(self, name, population, nation, parties=[], turnout=1):
+        Area.__init__(self, name, population, parties, turnout)
+        self.nation = nation
+
+    def __str__(self):
+        return """Country: {name}, part of {nation}. 
+        Population: {population}, Turnout: {turnout}%, 
+        Parties: {parties}""".format(
+            name=self.name, 
+            nation=self.nation.name,
+            population=self.population, 
+            turnout=self.turnout*100, 
+            parties=[x.name for x in self.parties])
+
+    def __repr__(self):
+        return 'Country(\'{name}\', {population}, {nation}, {parties}, {turnout})'.format(
+            name=self.name, 
+            population=self.population, 
+            nation=self.nation,
+            parties=self.parties, 
+            turnout=self.turnout)
+
+    @property
+    def nation(self):
+        return self._nation
+    
+    @nation.setter
+    def nation(self, nation):
+        if isinstance(nation, Nation):
+            self._nation = nation
+        else:
+            raise ValueError("nation must be a Nation-type object!")
+
 
 class LocalAuthority(Area):
     # todo: write docstrings
