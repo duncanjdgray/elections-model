@@ -88,22 +88,31 @@ p_sf = ec.Party(name="Sinn Féin",           # honestly I just don't know
                 scale_rl= 1.5)
 
 # set vote shares (national but restricted to areas they stand in), based on 2019 dataset
-p_con = 0.44
-p_lab = 0.34
-p_lib = 0.12
-p_grn = 0.03
-p_bxp = 0.05
-p_snp = 0.45
-p_plaid = 0.12
-p_dup = 0.33
-p_sdlp = 0.17
-p_all = 0.17
-p_uup = 0.13
-p_sf = 0.26
+p_con.voteshare = 0.44
+p_lab.voteshare = 0.34
+p_lib.voteshare = 0.12
+p_grn.voteshare = 0.03
+p_bxp.voteshare = 0.05
+p_snp.voteshare = 0.45
+p_plaid.voteshare = 0.12
+p_dup.voteshare = 0.33
+p_sdlp.voteshare = 0.17
+p_all.voteshare = 0.17
+p_uup.voteshare = 0.13
+p_sf.voteshare = 0.26
 
-# create sets of parties
+# set of countries
+country_names = {"England", "Scotland", "Wales", "Northern Ireland"}
+
+# sets of parties
 fptp_parties = {p_con, p_lab, p_lib, p_grn, p_bxp, p_snp, p_plaid, p_dup, p_sdlp, p_all, p_uup, p_sf}
 fptp_parties_eng = {p_con, p_lab, p_lib, p_grn, p_bxp}
 fptp_parties_scot = {p_con, p_lab, p_lib, p_grn, p_snp}
 fptp_parties_wal = {p_con, p_lab, p_lib, p_grn, p_plaid}
 fptp_parties_ni = {p_dup, p_sdlp, p_all, p_uup, p_sf}
+
+# map country name to party set
+map_country_parties = {"England" : fptp_parties_eng,
+                        "Scotland" : fptp_parties_scot,
+                        "Wales" : fptp_parties_wal,
+                        "Northern Ireland" : fptp_parties_ni}

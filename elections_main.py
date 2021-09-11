@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import random as rnd
 import elections_classes as ec
+from elections_maps import *
 from elections_inputs import *
 
 # import source data
@@ -28,6 +29,13 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
 # create Areas
 uk = ec.Nation("United Kingdom",0)
 
+countries = []
+for country in country_names:
+    countries.append(ec.Country(country, 0, uk, map_country_parties[country]))
+
+local_authorities = []
+for la in map_con_la.values().unique():
+    local_authorities.append(ec.LocalAuthority(la, 0, ))
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
