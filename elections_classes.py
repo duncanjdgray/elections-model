@@ -1,11 +1,13 @@
 import numpy as np 
 import pandas as pd 
+import random as rnd
 import math
-import random
 from elections_maps import *
 
 # %% Area-based classes
 class Area:
+    # todo: write docstring
+    
     def __init__(self, name, population, turnout=1):
         self.name = name
         self.population = population            # todo: investigate to add population from file - may want to input as a series or tuples
@@ -48,15 +50,24 @@ class Area:
         for i in len(list_parties):
             self.historical_vote_shares.append([list_parties[i].name, list_shares[i]])
 
-    def create_voters(self):
-        self.voters = []                        # clear any existing list of voters
-        for i in range(0,math.ceil(self.population * self.turnout)):
+    def create_voters(self, parties):
+        self.voters = []
+        self.parties_voteshares = [x.voteshare for x in parties]
+        for i in range(0, 10):
+            rnd_party = rnd.choices(parties, self.parties_voteshares, k=1)
+            rnd_lib_auth, rnd_left_right, rnd_rem_leave = -11, -11, -11             # set arguments out of bounds so while loops run at least once
+            while rnd_lib_auth < -10 or rnd_lib_auth >10:
+                rnd_lib_auth = np.random.normal(loc=rnd_party[0].lib_auth, scale=rnd_party.scale_la)
+            while rnd_left_right < -10 or rnd_left_right >10:
+                rnd_left_right = np.random.normal(loc=rnd_party[0].left_right, scale=rnd_party.scale_lr)
+            while rnd_rem_leave < -10 or rnd_rem_leave >10:
+                rnd_rem_leave = np.random.normal(loc=rnd_party[0].rem_leave, scale=rnd_party.scale_rl)
             self.voters.append(
                 Voter(name=str(i),
-                      lib_auth=random.uniform(-10,10),
-                      left_right=random.uniform(-10,10),
-                      rem_leave=random.uniform(-10,10),
-                      priority_axis=random.choices([0,1,2,3],[5,1,1,2],k=1)[0]))         # todo: make voters not purely random
+                      lib_auth=rnd_lib_auth,
+                      left_right=rnd_left_right,
+                      rem_leave=rnd_rem_leave,
+                      priority_axis=rnd.choices([0,1,2,3],[10,1,2,2],k=1)[0]))      # most voters care about all axes, some prioritise one, but fewer prioritise lib-auth than left-right or rem-leave
 
     def print_voters(self):
         for i in self.voters:
@@ -84,6 +95,7 @@ class Area:
     def decide_winner(self, system):
         if system == "FPTP":
             self.winner = self._votes_sorted[0][0]
+            # todo: account for ties
         else:
             raise ValueError("system not set to recognised value. Recognised values are: FPTP")
 
@@ -98,7 +110,7 @@ class Area:
 
 
     def call_election(self, list_parties, system):
-        self.create_voters()
+        self.create_voters(list_parties)
         self.gen_voter_prefs(list_parties)
         self.cast_votes(system)
         self.tally_votes(system)
@@ -107,27 +119,57 @@ class Area:
     # todo: allow areas to hold historical vote shares for parties
 
 class Constituency(Area):
+    # todo: write docstrings
+
     def __init__(self, name, population, turnout=1):
         Area.__init__(self, name, population, turnout)
 
     def __str__(self):
-        return 'Area: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+        return 'Constituency: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
 
     def __repr__(self):
         return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
 
 class LocalAuthority(Area):
+    # todo: write docstrings
+    
     def __init__(self, name, population, turnout=1):
         Area.__init__(self, name, population, turnout)
 
     def __str__(self):
-        return 'Area: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+        return 'Local Authority: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
 
     def __repr__(self):
-        return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+        return 'LocalAuthority(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+
+class Country(Area):
+    # todo: write docstrings
+
+    def __init__(self, name, population, parties=[], turnout=1):
+        Area.__init__(self, name, population, turnout)
+        self.parties = parties
+
+    def __str__(self):
+        return 'Country: {name}, Population: {population}, Turnout: {turnout}, Parties: {parties}'.format(name=self.name, population=self.population, turnout=self.turnout, parties=self.parties)
+
+    def __repr__(self):
+        return 'Country(\'{name}\', {population}, {parties}, {turnout})'.format(name=self.name, population=self.population, parties=self.parties, turnout=self.turnout)
+
+    @property
+    def parties(self):
+        return self._parties
+
+    @parties.setter
+    def parties(self, parties):   
+        if all(isinstance(x, Party) for x in parties):
+            self._parties = parties
+        else:
+            raise TypeError("all elements of parties must be Party-type objects!")
 
 # %% Actor-based classes
 class Actor:
+    # todo: write docstring
+    
     def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0):
         self.name = name
         self.lib_auth = lib_auth
@@ -182,9 +224,14 @@ class Actor:
             raise ValueError("rem_leave must be between -10 and 10 inclusive!")
 
 class Party(Actor):
-    def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0, voteshare=0):
+    # todo: write docstring
+    
+    def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0, voteshare=0, scale_la=2, scale_lr=2, scale_rl=2):
         Actor.__init__(self, name, lib_auth, left_right, rem_leave)
         self.voteshare = voteshare
+        self.scale_la = scale_la
+        self.scale_lr = scale_lr
+        self.scale_rl = scale_rl
 
     def __str__(self):
         return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, \
@@ -196,13 +243,16 @@ class Party(Actor):
                 voteshare=self.voteshare*100)
 
     def __repr__(self):
-        return 'Party(\'{name}\', {lib_auth}, {left_right}, {rem_leave}, {voteshare})'.format(
+        return 'Party(\'{name}\', {lib_auth}, {left_right}, {rem_leave}, {voteshare}, {scale_la}, {scale_lr}, {scale_rl})'.format(
             name=self.name, 
             lib_auth=self.lib_auth, 
             left_right=self.left_right, 
             rem_leave=self.rem_leave, 
-            voteshare=self.voteshare)
-
+            voteshare=self.voteshare,
+            scale_la=self.scale_la,
+            scale_lr=self.scale_lr,
+            scale_rl=self.scale_rl)
+    
     @property
     def voteshare(self):
         return self._voteshare
@@ -214,10 +264,44 @@ class Party(Actor):
         else:
             raise ValueError("voteshare must be between 0 and 1 inclusive!")
 
+    @property
+    def scale_la(self):
+        return self.scale_la
+
+    @scale_la.setter
+    def scale_la(self, scale_la):
+        if scale_la >= 0 and scale_la <= 5:
+            self.scale_la = scale_la
+        else:
+            raise ValueError("scale_la must be between 0 and 5 inclusive!")
+
+    @property
+    def scale_lr(self):
+        return self.scale_lr
+
+    @scale_lr.setter
+    def scale_lr(self, scale_lr):
+        if scale_lr >= 0 and scale_lr <= 5:
+            self.scale_lr = scale_lr
+        else:
+            raise ValueError("scale_lr must be between 0 and 5 inclusive!")
+
+    @property
+    def scale_rl(self):
+        return self.scale_rl
+
+    @scale_rl.setter
+    def scale_rl(self, scale_rl):
+        if scale_rl >= 0 and scale_rl <= 5:
+            self.scale_rl = scale_rl
+        else:
+            raise ValueError("scale_rl must be between 0 and 5 inclusive!")
+
 class Voter(Actor):
+    # todo: write docstring
+    
     """
-        priority_axis will force voter to only care about one axis, not both.
-        -1 for lib_auth, 1 for left_right, 0 for both
+        priority_axis will force voter to only care about one axis. check map_priority_axes for details
     """
     def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0, priority_axis=0):
         Actor.__init__(self, name, lib_auth, left_right, rem_leave)
