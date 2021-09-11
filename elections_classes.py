@@ -153,10 +153,20 @@ class LocalAuthority(Area):
         self.country = country
 
     def __str__(self):
-        return 'Local Authority: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+        return """Local Authority: {name}, part of {country}.
+        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(
+            name=self.name, 
+            country=self.country, 
+            population=self.population, 
+            turnout=self.turnout, 
+            voters=len(self.voters))
 
     def __repr__(self):
-        return 'LocalAuthority(\'{name}\', {population}, {parties}, {turnout})'.format(name=self.name, population=self.population, parties=self.parties, turnout=self.turnout)
+        return 'LocalAuthority(\'{name}\', {population}, {country}, {turnout})'.format(
+            name=self.name, 
+            population=self.population, 
+            country=self.country, 
+            turnout=self.turnout)
 
     @property
     def country(self):
@@ -177,10 +187,20 @@ class Constituency(Area):
         self.la = localauthority
 
     def __str__(self):
-        return 'Constituency: {name}, Population: {population}, Turnout: {turnout}, Voters: {voters}'.format(name=self.name, population=self.population, turnout=self.turnout, voters=len(self.voters))
+        return """Constituency: {name}, part of the {localauthority} local authority. 
+        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(
+            name=self.name, 
+            localauthority=self.la, 
+            population=self.population, 
+            turnout=self.turnout, 
+            voters=len(self.voters))
 
     def __repr__(self):
-        return 'Constituency(\'{name}\', {population}, {turnout})'.format(name=self.name, population=self.population, turnout=self.turnout)
+        return 'Constituency(\'{name}\', {population}, {localauthority}, {turnout})'.format(
+            name=self.name, 
+            population=self.population, 
+            localauthority=self.la, 
+            turnout=self.turnout)
 
     @property
     def la(self):
@@ -202,10 +222,19 @@ class Ward(Area):
 
     def __str__(self):
         return """Ward: {name}, part of the {constituency} constituency. 
-        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(name=self.name, constituency=self.cons, population=self.population, turnout=self.turnout, voters=len(self.voters))
+        Population: {population}, Turnout: {turnout}, Voters: {voters}""".format(
+            name=self.name, 
+            constituency=self.cons, 
+            population=self.population, 
+            turnout=self.turnout, 
+            voters=len(self.voters))
 
     def __repr__(self):
-        return 'Ward(\'{name}\', {population}, {constituency}, {turnout})'.format(name=self.name, population=self.population, constituency=self.cons, turnout=self.turnout)
+        return 'Ward(\'{name}\', {population}, {constituency}, {turnout})'.format(
+            name=self.name, 
+            population=self.population, 
+            constituency=self.cons, 
+            turnout=self.turnout)
 
     @property
     def cons(self):
