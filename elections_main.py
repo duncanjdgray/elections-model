@@ -80,6 +80,19 @@ uk.population = 0
 for nation in uk.children:
     uk.population += nation[0].population
 
+# %% add historic voteshares
+
+# for each party in each constituency, get historic share. if con not found ('birmingham, selly oak'), use national shares. If NaN found, set to 0
+for con in dict_constituencies.values():
+    for party in con.parties:
+        if con.name in ge_results_2019_long.index.get_level_values(0):
+            if float(ge_results_2019_long.loc[con.name,map_party_name_code[party.name]].share) >= 0:
+                con.local_voteshares[party] = float(ge_results_2019_long.loc[con.name,map_party_name_code[party.name]].share)
+            else:
+                con.local_voteshares[party] = 0
+        else:
+            con.local_voteshares[party] = party.voteshare
+
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
 # done in inputs - Define national lists of parties (lists in _maps.py)

@@ -90,6 +90,20 @@ p_sf = ec.Party(name="Sinn Féin",           # honestly I just don't know
                 rem_leave= -5,
                 scale_rl= 1.5)
 
+# map party names to codes
+map_party_name_code = {"Conservatives":"con",
+                        "Labour":"lab",
+                        "Liberal Democrats":"lib",
+                        "Greens":"grn",
+                        "Brexit":"bxp",
+                        "Scottish Nationals":"snp",
+                        "Plaid Cymru":"plaid",
+                        "Democratic Unionists":"dup",
+                        "Social Democrats & Labour":"sdlp",
+                        "Alliance":"all",
+                        "Ulster Unionists":"uup",
+                        "Sinn Féin":"sf"}
+
 # set vote shares (national but restricted to areas they stand in), based on 2019 dataset
 p_con.voteshare = 0.44
 p_lab.voteshare = 0.34

@@ -24,10 +24,10 @@ class Area:
             self.parties = []
         else:
             self.parties = parties
-        self.votes = []
-        self.voters = []
-        self.winner = []
-        self.historical_vote_shares = []
+        self.votes = None
+        self.voters = None
+        self.winner = None
+        self.local_voteshares = dict()
 
     def __str__(self):
         return """Area: {name}, Population: {population}, Voters: {voters}
@@ -106,19 +106,10 @@ class Area:
         else:
             raise ValueError("turnout must be between 0 and 1 inclusive!")
 
-    def input_hist_shares(self, list_parties, list_shares):
-        self.historical_vote_shares = []
-        for i in len(list_parties):
-            self.historical_vote_shares.append([list_parties[i].name, list_shares[i]])
-
-    def set_party_voteshares(self, parties):
-        self.parties_voteshares = [x.voteshare for x in parties]
-
-    def create_voters(self, parties):
+    def create_voters(self, parties, voteshares):
         self.voters = []
-        self.set_party_voteshares()
-        for i in range(0, 10):
-            rnd_party = rnd.choices(parties, self.parties_voteshares, k=1)
+        for i in range(0, round(self.population * self.turnout)):
+            rnd_party = rnd.choices(parties, voteshares, k=1)
             rnd_lib_auth, rnd_left_right, rnd_rem_leave = -11, -11, -11             # set arguments out of bounds so while loops run at least once
             while rnd_lib_auth < -10 or rnd_lib_auth >10:
                 rnd_lib_auth = np.random.normal(loc=rnd_party[0].lib_auth, scale=rnd_party.scale_la)
@@ -358,32 +349,23 @@ class Actor:
 class Party(Actor):
     # todo: write docstring
     
-    def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0, voteshare=0, scale_la=2, scale_lr=2, scale_rl=2):
+    def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0, voteshare=None, scale_la=2, scale_lr=2, scale_rl=2):
         Actor.__init__(self, name, lib_auth, left_right, rem_leave)
-        self.voteshare = voteshare
+        if voteshare == None:
+            self.voteshare = 0
+        else: 
+            self.voteshare = voteshare
         self.scale_la = scale_la
         self.scale_lr = scale_lr
         self.scale_rl = scale_rl
 
-    def __str__(self):
-        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right},
-        Remain-Leave: {rem_leave}, Vote share: {voteshare}%""".format(
+    def __repr__(self):
+        return """Party: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, Remain-Leave: {rem_leave}, Vote share: {voteshare}%""".format(
                 name=self.name, 
                 lib_auth=self.lib_auth, 
                 left_right=self.left_right, 
                 rem_leave = self.rem_leave, 
                 voteshare=self.voteshare*100)
-
-    def __repr__(self):
-        return 'Party(\'{name}\', {lib_auth}, {left_right}, {rem_leave}, {voteshare}, {scale_la}, {scale_lr}, {scale_rl})'.format(
-            name=self.name, 
-            lib_auth=self.lib_auth, 
-            left_right=self.left_right, 
-            rem_leave=self.rem_leave, 
-            voteshare=self.voteshare,
-            scale_la=self.scale_la,
-            scale_lr=self.scale_lr,
-            scale_rl=self.scale_rl)
     
     @property
     def voteshare(self):
