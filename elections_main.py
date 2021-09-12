@@ -5,7 +5,7 @@ import elections_classes as ec
 from elections_maps import *
 from elections_inputs import *
 
-# import source data
+# %% import source data
 data_popn_by_ward = pd.DataFrame(pd.read_csv("data/data_popn_by_ward.csv")).apply(lambda x: x.astype(str).str.lower())
 data_eu_ref_by_con = pd.DataFrame(pd.read_csv("data/data_eu_ref_by_con.csv")).apply(lambda x: x.astype(str).str.lower())
 ge_results_2019_wide = pd.DataFrame(pd.read_excel(
@@ -26,16 +26,16 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
                                         j="party",
                                         suffix=r'\w+')
 
-# create Areas
-uk = ec.Nation("United Kingdom",0)
+# %% create Areas
+uk = ec.Country("United Kingdom",0)
 
-dict_countries = dict()
-for country in list_country:
-    dict_countries[country] = ec.Country(country, 0, uk, map_country_parties[country])
+dict_nations = dict()
+for nation in list_nation:
+    dict_nations[nation] = ec.Nation(nation, 0, uk, map_nation_parties[nation])
 
 dict_localauthorities = dict()
 for la in list_la:
-    dict_localauthorities[la] = ec.LocalAuthority(la, 0, dict_countries[map_la_country[la]], dict_countries[map_la_country[la]].parties)
+    dict_localauthorities[la] = ec.LocalAuthority(la, 0, dict_nations[map_la_nation[la]], dict_nations[map_la_nation[la]].parties)
 
 dict_constituencies = dict()
 for con in list_con:
@@ -45,7 +45,7 @@ dict_wards = dict()
 for ward in list_ward:
     dict_wards[ward] = ec.Ward(ward, 0, dict_constituencies[map_ward_con[ward]], dict_constituencies[map_ward_con[ward]].parties)
 
-# add populations
+# %% add populations
 voting_ages = [str(x) for x in range(min_voter_age,90)]
 voting_ages.append('90+')
 data_popn_by_ward['voting_popn'] = data_popn_by_ward[voting_ages].apply(pd.to_numeric).sum(axis=1)
@@ -69,11 +69,11 @@ for la in dict_localauthorities.values():
     for con in conlist:
         la.population += con.population
 
-for country in dict_countries.values():
-    country.population = 0
-    lalist = [x for x in dict_localauthorities.values() if x.country == country]
+for nation in dict_nations.values():
+    nation.population = 0
+    lalist = [x for x in dict_localauthorities.values() if x.nation == nation]
     for la in lalist:
-        country.population += la.population
+        nation.population += la.population
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
@@ -83,8 +83,8 @@ for country in dict_countries.values():
 # done - For each LA, create a set of Cons
 # done - For each Cons, create a set of Wards
 # done -  Give each Ward a population
-# todo: For each Cons, sum its Wards' popn
-# todo: Repeat for LAs and Countries
+# done - For each Cons, sum its Wards' popn
+# done - Repeat for LAs and Countries
 # todo: Give each Cons a historic voteshare for each of its parties
 # todo: For each Ward, take its Cons' historic voteshare
 # todo: For each LA, take a popn-based weighted average of each of its Cons' voteshares

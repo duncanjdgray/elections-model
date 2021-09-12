@@ -8,11 +8,13 @@ from elections_maps import map_priority_axes
 class Area:
     # todo: write docstring
     
-    def __init__(self, name, population, parties=[], turnout=1):
+    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
         self.name = name
-        self.population = population            # todo: investigate to add population from file - may want to input as a series or tuples
+        self.population = population
         self.parties = parties
         self.turnout = turnout
+        self.parent = parent
+        self.children = children        
         self.votes = []
         self.voters = []
         self.winner = []
@@ -43,6 +45,31 @@ class Area:
             self._population = population
         else:
             raise ValueError("population cannot be negative!")
+
+    @property
+    def parent(self):
+        return self._parent
+    
+    @parent.setter
+    def parent(self, parent):
+        if isinstance(parent, Area) or parent == []:
+            self._parent = parent
+            self._parent_type = type(parent)
+        else:
+            raise TypeError("parent must be a single Area-type object!")
+
+    @property
+    def children(self):
+        return self._children
+    
+    @children.setter
+    def children(self, children):
+        if isinstance(children, Area) or children == [] or \
+           all(isinstance(x, Area) for x in children):
+            self._children = children
+            self._children_type = type(children)
+        else:
+            raise TypeError("children must only be one or more Area-type objects!")
 
     @property
     def parties(self):
@@ -140,11 +167,11 @@ class Area:
         self.decide_winner(system)
 
     # todo: allow areas to hold historical vote shares for parties
-class Nation(Area):
+class Country(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, parties=[], turnout=1):
-        Area.__init__(self, name, population, parties, turnout)
+    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+        Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
         return """Country: {name}, Population: {population}, Turnout: {turnout}%, 
@@ -161,147 +188,102 @@ class Nation(Area):
             parties=self.parties, 
             turnout=self.turnout)
 
-class Country(Area):
+class Nation(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, nation, parties=[], turnout=1):
-        Area.__init__(self, name, population, parties, turnout)
-        self.nation = nation
+    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+        Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
-        return """Country: {name}, part of {nation}. 
+        return """Nation: {name}, part of {country}. 
         Population: {population}, Turnout: {turnout}%, 
         Parties: {parties}""".format(
             name=self.name, 
-            nation=self.nation.name,
+            country=self.parent.name,
             population=self.population, 
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
     def __repr__(self):
-        return 'Country(\'{name}\', {population}, {nation}, {parties}, {turnout})'.format(
+        return 'Nation(\'{name}\', {population}, {parent}, {children}, , {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
-            nation=self.nation,
+            parent=self.parent,
+            children = self.children,
             parties=self.parties, 
             turnout=self.turnout)
-
-    @property
-    def nation(self):
-        return self._nation
-    
-    @nation.setter
-    def nation(self, nation):
-        if isinstance(nation, Nation):
-            self._nation = nation
-        else:
-            raise ValueError("nation must be a Nation-type object!")
-
 
 class LocalAuthority(Area):
     # todo: write docstrings
     
-    def __init__(self, name, population, country, parties=[], turnout=1):
-        Area.__init__(self, name, population, parties, turnout)
-        self.country = country
+    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+        Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
-        return """Local Authority: {name}, part of {country}.
+        return """Local Authority: {name}, part of {nation}.
         Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
-            country=self.country.name, 
+            nation=self.parent.name, 
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
 
     def __repr__(self):
-        return 'LocalAuthority(\'{name}\', {population}, {country}, {parties}, {turnout})'.format(
+        return 'LocalAuthority(\'{name}\', {population}, {parent}, {children}, {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
-            country=self.country, 
+            parent=self.parent,
+            children=self.children, 
             parties=self.parties,
             turnout=self.turnout)
-
-    @property
-    def country(self):
-        return self._country
-    
-    @country.setter
-    def country(self, country):
-        if isinstance(country, Country):
-            self._country = country
-        else:
-            raise ValueError("country must be a Country-type object!")
 
 class Constituency(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, localauthority, parties=[], turnout=1):
-        Area.__init__(self, name, population, parties, turnout)
-        self.la = localauthority
+    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+        Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
         return """Constituency: {name}, part of the {localauthority} local authority. 
         Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
-            localauthority=self.la.name, 
+            localauthority=self.parent.name, 
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
 
     def __repr__(self):
-        return 'Constituency(\'{name}\', {population}, {localauthority}, {parties}, {turnout})'.format(
+        return 'Constituency(\'{name}\', {population}, {parent}, {children}, {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
-            localauthority=self.la,
+            parent=self.parent,
+            children=self.children,
             parties=self.parties,
             turnout=self.turnout)
-
-    @property
-    def la(self):
-        return self._la
-    
-    @la.setter
-    def la(self, localauthority):
-        if isinstance(localauthority, LocalAuthority):
-            self._la = localauthority
-        else:
-            raise ValueError("localauthority must be a LocalAuthority-type object!")
 
 class Ward(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, constituency, parties=[], turnout=1):
-        Area.__init__(self, name, population, parties, turnout)
-        self.cons = constituency
+    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+        Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
         return """Ward: {name}, part of the {constituency} constituency. 
         Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
-            constituency=self.cons.name, 
+            constituency=self.parent.name, 
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
 
     def __repr__(self):
-        return 'Ward(\'{name}\', {population}, {constituency}, {parties}, {turnout})'.format(
+        return 'Ward(\'{name}\', {population}, {parent}, {children}, {parties}, {turnout})'.format(
             name=self.name, 
             population=self.population, 
-            constituency=self.cons, 
+            parent=self.parent,
+            children=self.children, 
             parties=self.parties,
             turnout=self.turnout)
-
-    @property
-    def cons(self):
-        return self._cons
-    
-    @cons.setter
-    def cons(self, constituency):
-        if isinstance(constituency, Constituency):
-            self._cons = constituency
-        else:
-            raise ValueError("constituency must be a Constituency-type object!")
 
 # %% Actor-based classes
 class Actor:

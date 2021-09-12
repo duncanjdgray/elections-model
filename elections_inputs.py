@@ -111,8 +111,8 @@ fptp_parties_scot = {p_con, p_lab, p_lib, p_grn, p_snp}
 fptp_parties_wal = {p_con, p_lab, p_lib, p_grn, p_plaid}
 fptp_parties_ni = {p_dup, p_sdlp, p_all, p_uup, p_sf}
 
-# map country name to party set
-map_country_parties = {"england" : fptp_parties_eng,
+# map nation name to party set
+map_nation_parties = {"england" : fptp_parties_eng,
                         "scotland" : fptp_parties_scot,
                         "wales" : fptp_parties_wal,
                         "northern ireland" : fptp_parties_ni}

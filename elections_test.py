@@ -31,7 +31,7 @@ ge_results_constituencies["in_map"] = ge_results_constituencies['constituency'].
 ge_results_constituencies["in_map"].describe()
 
 test_la = pd.DataFrame(list_la)
-test_la['check'] = test_la[0].isin(map_la_country)
+test_la['check'] = test_la[0].isin(map_la_nation)
 
 # Test code for setting up one area
 
@@ -49,9 +49,10 @@ here = ec.Area("Treyarnon", 10, parties, 0.7)
 # print(here.winner)
 # here.declare_winner("FPTP")
 
-# testing setting up various tiers of area
-uk = ec.Nation("UK", 150, parties)
-eng = ec.Country("England", 100, uk, parties)
+# testing setting up various tiers of area 
+# todo: update calling of areas to account for new arguments
+uk = ec.Country("UK", 150, parties)
+eng = ec.Nation("England", 100, uk, parties)
 corn = ec.LocalAuthority("Cornwall", 25, eng, uk.parties)
 pad = ec.Constituency("Padstow", 10, corn, corn.parties)
 berm = ec.Constituency("Bermondsey and Old Southwark", 20, corn, corn.parties)
