@@ -38,15 +38,16 @@ dict_localauthorities = dict()
 for la in list_la:
     dict_localauthorities[la] = ec.LocalAuthority(la, 0, dict_nations[map_la_nation[la]], parties=dict_nations[map_la_nation[la]].parties)
     dict_localauthorities[la].parent.append_children(dict_localauthorities[la])
-    print("Added " + la + " to " + dict_localauthorities[la].parent.name)
 
 dict_constituencies = dict()
 for con in list_con:
     dict_constituencies[con] = ec.Constituency(con, 0, dict_localauthorities[map_con_la[con]], parties=dict_localauthorities[map_con_la[con]].parties)
+    dict_constituencies[con].parent.append_children(dict_constituencies[con])
 
 dict_wards = dict()
 for ward in list_ward:
     dict_wards[ward] = ec.Ward(ward, 0, dict_constituencies[map_ward_con[ward]], parties=dict_constituencies[map_ward_con[ward]].parties)
+    dict_wards[ward].parent.append_children(dict_wards[ward])
 
 # %% add populations
 voting_ages = [str(x) for x in range(min_voter_age,90)]
@@ -62,21 +63,22 @@ for ward in dict_wards.values():
 
 for con in dict_constituencies.values():
     con.population = 0
-    wardlist = [x for x in dict_wards.values() if x.cons == con]
-    for ward in wardlist:
-        con.population += ward.population
+    for ward in con.children:
+        con.population += ward[0].population
 
 for la in dict_localauthorities.values():
     la.population = 0
-    conlist = [x for x in dict_constituencies.values() if x.la == la]
-    for con in conlist:
-        la.population += con.population
+    for con in la.children:
+        la.population += con[0].population
 
 for nation in dict_nations.values():
     nation.population = 0
-    lalist = [x for x in dict_localauthorities.values() if x.nation == nation]
-    for la in lalist:
-        nation.population += la.population
+    for la in nation.children:
+        nation.population += la[0].population
+
+uk.population = 0
+for nation in uk.children:
+    uk.population += nation[0].population
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
