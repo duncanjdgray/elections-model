@@ -93,6 +93,16 @@ for con in dict_constituencies.values():
         else:
             con.local_voteshares[party] = party.voteshare
 
+for con in dict_constituencies.values():
+    for ward in con.children:
+        ward.local_voteshares = con.local_voteshares
+
+
+
+# %% generate voters
+# example code:
+# dict_constituencies["ynys mon"].create_voters(list(dict_constituencies["ynys mon"].local_voteshares.keys()),list(dict_constituencies["ynys mon"].local_voteshares.values()))
+
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
 # done in inputs - Define national lists of parties (lists in _maps.py)
@@ -103,8 +113,8 @@ for con in dict_constituencies.values():
 # done -  Give each Ward a population
 # done - For each Cons, sum its Wards' popn
 # done - Repeat for LAs and Countries
-# todo: Give each Cons a historic voteshare for each of its parties
-# todo: For each Ward, take its Cons' historic voteshare
+# done - Give each Cons a historic voteshare for each of its parties
+# done - For each Ward, take its Cons' historic voteshare
 # todo: For each LA, take a popn-based weighted average of each of its Cons' voteshares
 # todo: For each Country, the same
 # todo: now we have a set of countries, their LAs, their cons, and their wards, each with a popn, a set of parties, and those parties' historic vote shares (or nat'l averages where no data available)

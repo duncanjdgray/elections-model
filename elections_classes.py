@@ -112,11 +112,12 @@ class Area:
             rnd_party = rnd.choices(parties, voteshares, k=1)
             rnd_lib_auth, rnd_left_right, rnd_rem_leave = -11, -11, -11             # set arguments out of bounds so while loops run at least once
             while rnd_lib_auth < -10 or rnd_lib_auth >10:
-                rnd_lib_auth = np.random.normal(loc=rnd_party[0].lib_auth, scale=rnd_party.scale_la)
+                rnd_lib_auth = np.random.normal(loc=rnd_party[0].lib_auth, scale=rnd_party[0].scale_la)
             while rnd_left_right < -10 or rnd_left_right >10:
-                rnd_left_right = np.random.normal(loc=rnd_party[0].left_right, scale=rnd_party.scale_lr)
+                rnd_left_right = np.random.normal(loc=rnd_party[0].left_right, scale=rnd_party[0].scale_lr)
             while rnd_rem_leave < -10 or rnd_rem_leave >10:
-                rnd_rem_leave = np.random.normal(loc=rnd_party[0].rem_leave, scale=rnd_party.scale_rl)
+                rnd_rem_leave = np.random.normal(loc=rnd_party[0].rem_leave, scale=rnd_party[0].scale_rl)
+            print("Generating voter from " + rnd_party[0].name + " with lib-auth=" + str(rnd_lib_auth) + ", left-right=" + str(rnd_left_right) + " & rem-leave= " + str(rnd_rem_leave))
             self.voters.append(
                 Voter(name=str(i),
                       lib_auth=rnd_lib_auth,
