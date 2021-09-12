@@ -27,23 +27,26 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
                                         suffix=r'\w+')
 
 # %% create Areas
-uk = ec.Country("United Kingdom",0)
+uk = ec.Country("united kingdom",0)
 
 dict_nations = dict()
 for nation in list_nation:
-    dict_nations[nation] = ec.Nation(nation, 0, uk, map_nation_parties[nation])
+    dict_nations[nation] = ec.Nation(nation, 0, uk, parties=map_nation_parties[nation])
+    uk.append_children(dict_nations[nation])
 
 dict_localauthorities = dict()
 for la in list_la:
-    dict_localauthorities[la] = ec.LocalAuthority(la, 0, dict_nations[map_la_nation[la]], dict_nations[map_la_nation[la]].parties)
+    dict_localauthorities[la] = ec.LocalAuthority(la, 0, dict_nations[map_la_nation[la]], parties=dict_nations[map_la_nation[la]].parties)
+    dict_localauthorities[la].parent.append_children(dict_localauthorities[la])
+    print("Added " + la + " to " + dict_localauthorities[la].parent.name)
 
 dict_constituencies = dict()
 for con in list_con:
-    dict_constituencies[con] = ec.Constituency(con, 0, dict_localauthorities[map_con_la[con]], dict_localauthorities[map_con_la[con]].parties)
+    dict_constituencies[con] = ec.Constituency(con, 0, dict_localauthorities[map_con_la[con]], parties=dict_localauthorities[map_con_la[con]].parties)
 
 dict_wards = dict()
 for ward in list_ward:
-    dict_wards[ward] = ec.Ward(ward, 0, dict_constituencies[map_ward_con[ward]], dict_constituencies[map_ward_con[ward]].parties)
+    dict_wards[ward] = ec.Ward(ward, 0, dict_constituencies[map_ward_con[ward]], parties=dict_constituencies[map_ward_con[ward]].parties)
 
 # %% add populations
 voting_ages = [str(x) for x in range(min_voter_age,90)]

@@ -8,13 +8,22 @@ from elections_maps import map_priority_axes
 class Area:
     # todo: write docstring
     
-    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+    def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         self.name = name
         self.population = population
-        self.parties = parties
         self.turnout = turnout
-        self.parent = parent
-        self.children = children        
+        if parent == None:
+            self.parent = []
+        else:
+            self.parent = parent
+        if children == None:
+            self.children = []
+        else:
+            self.children = children        
+        if parties == None:
+            self.parties = []
+        else:
+            self.parties = parties
         self.votes = []
         self.voters = []
         self.winner = []
@@ -54,7 +63,6 @@ class Area:
     def parent(self, parent):
         if isinstance(parent, Area) or parent == []:
             self._parent = parent
-            self._parent_type = type(parent)
         else:
             raise TypeError("parent must be a single Area-type object!")
 
@@ -67,9 +75,14 @@ class Area:
         if isinstance(children, Area) or children == [] or \
            all(isinstance(x, Area) for x in children):
             self._children = children
-            self._children_type = type(children)
         else:
             raise TypeError("children must only be one or more Area-type objects!")
+
+    def append_children(self, new_child):
+        if isinstance(new_child, Area):
+            self._children.append([new_child])
+        else:
+            raise TypeError("new_child must be a single Area-type object!")
 
     @property
     def parties(self):
@@ -170,7 +183,7 @@ class Area:
 class Country(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+    def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
@@ -191,7 +204,7 @@ class Country(Area):
 class Nation(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+    def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
@@ -216,7 +229,7 @@ class Nation(Area):
 class LocalAuthority(Area):
     # todo: write docstrings
     
-    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+    def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
@@ -240,7 +253,7 @@ class LocalAuthority(Area):
 class Constituency(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+    def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
@@ -264,7 +277,7 @@ class Constituency(Area):
 class Ward(Area):
     # todo: write docstrings
 
-    def __init__(self, name, population, parent=[], children=[], parties=[], turnout=1):
+    def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
     def __str__(self):
