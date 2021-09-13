@@ -109,19 +109,32 @@ for nation in dict_nations.values():
 # example code:
 # dict_constituencies["ynys mon"].create_voters(list(dict_constituencies["ynys mon"].local_voteshares.keys()),list(dict_constituencies["ynys mon"].local_voteshares.values()))
 print("Generating voters in constituencies...")
-progress = 0
-i = 0
-for con in dict_constituencies.values():
-    i += 1
-    if i >= len(dict_constituencies)/10:
-        i = 0
-        progress += 0.1
-        print("    " + str(round(progress * 100)) + "% of areas completed...")
-    con.create_voters(list(con.local_voteshares.keys()),list(con.local_voteshares.values()))
-print("    100% of areas completed.")
+# progress = 0
+# i = 0
+# for con in dict_constituencies.values():
+#     i += 1
+#     if i >= len(dict_constituencies)/10:
+#         i = 0
+#         progress += 0.1
+#         print("    " + str(round(progress * 100)) + "% of areas completed...")
+#     con.create_voters(list(con.local_voteshares.keys()),list(con.local_voteshares.values()))
+# print("    100% of areas completed.")
 
 # %% call elections
+# ward - abbey
+# dict_wards['abbey'].call_election(system="FPTP", declare_winners=True)
 
+# con - barking
+# dict_constituencies['barking'].call_election("FPTP",True)
+
+# la - barnet
+# dict_localauthorities['barnet'].call_election("FPTP",True)
+
+# nation - wales
+#dict_nations['wales'].call_election("FPTP",True)
+
+# country - uk
+uk.call_election("FPTP", True)
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)

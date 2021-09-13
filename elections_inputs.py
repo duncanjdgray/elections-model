@@ -4,7 +4,7 @@ import elections_classes as ec
 min_voter_age = 18
 
 # scale factor to reduce population to tractable size
-population_scale_factor = 50
+population_scale_factor = 250
 
 # tactical voting factor
 tactical_voting_factor = 0.2
