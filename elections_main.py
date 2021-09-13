@@ -88,15 +88,23 @@ for con in dict_constituencies.values():
         if con.name in ge_results_2019_long.index.get_level_values(0):
             if float(ge_results_2019_long.loc[con.name,map_party_name_code[party.name]].share) >= 0:
                 con.local_voteshares[party] = float(ge_results_2019_long.loc[con.name,map_party_name_code[party.name]].share)
+                con.local_votecounts[party] = float(ge_results_2019_long.loc[con.name,map_party_name_code[party.name]].votes)
             else:
                 con.local_voteshares[party] = 0
+                con.local_votecounts[party] = 0
         else:
             con.local_voteshares[party] = party.voteshare
+            con.local_votecounts[party] = con.local_voteshares[party] * con.population
 
-for con in dict_constituencies.values():
-    for ward in con.children:
-        ward.local_voteshares = con.local_voteshares
+for ward in dict_wards.values():
+    ward.get_local_votes_from_parent()
 
+for la in dict_localauthorities.values():
+    la.get_local_votes_from_children()
+
+for nation in dict_nations.values():
+    print(nation.name + " getting votes from children")
+    nation.get_local_votes_from_children()
 
 
 # %% generate voters
@@ -115,9 +123,9 @@ for con in dict_constituencies.values():
 # done - Repeat for LAs and Countries
 # done - Give each Cons a historic voteshare for each of its parties
 # done - For each Ward, take its Cons' historic voteshare
-# todo: For each LA, take a popn-based weighted average of each of its Cons' voteshares
-# todo: For each Country, the same
-# todo: now we have a set of countries, their LAs, their cons, and their wards, each with a popn, a set of parties, and those parties' historic vote shares (or nat'l averages where no data available)
+# done - For each LA, take a popn-based weighted average of each of its Cons' voteshares
+# done - For each Country, the same
+# done - now we have a set of countries, their LAs, their cons, and their wards, each with a popn, a set of parties, and those parties' historic vote shares (or nat'l averages where no data available)
 # todo: add a check - compare newly calculated country vote shares to input average vote shares - are we close?
 # todo: can now run a national election under FPTP?
 

@@ -24,10 +24,11 @@ class Area:
             self.parties = []
         else:
             self.parties = parties
-        self.votes = None
-        self.voters = None
-        self.winner = None
+        self.votes = []
+        self.voters = []
+        self.winner = []
         self.local_voteshares = dict()
+        self.local_votecounts = dict()
 
     def __str__(self):
         return """Area: {name}, Population: {population}, Voters: {voters}
@@ -171,7 +172,28 @@ class Area:
         self.tally_votes(system)
         self.decide_winner(system)
 
-    # todo: allow areas to hold historical vote shares for parties
+    def get_local_votes_from_parent(self):
+        self.local_voteshares = self.parent.local_voteshares
+        self.local_votecounts = self.parent.local_votecounts
+
+    def get_local_votes_from_children(self):
+        if self.children != []:
+            for child in self.children:
+                for party in self.parties:
+                    print('Trying to load in ' + child[0].name + ' votes for ' + party.name)
+                    if party in self.local_votecounts.keys():
+                        self.local_votecounts[party] += child[0].local_votecounts[party]
+                    else:
+                        self.local_votecounts[party] = child[0].local_votecounts[party]
+            
+            for party in self.parties:
+                self.local_voteshares[party] = self.local_votecounts[party] / sum(self.local_votecounts.values())
+
+        if self.local_voteshares == {}:
+            for party in self.parties:
+                self.local_voteshares[party] = party.voteshare
+                self.local_votecounts[party] = self.local_voteshares[party] * self.population
+
 class Country(Area):
     # todo: write docstrings
 
