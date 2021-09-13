@@ -111,7 +111,6 @@ class Area:
                 rnd_left_right = np.random.normal(loc=rnd_party[0].left_right, scale=rnd_party[0].scale_lr)
             while rnd_rem_leave < -10 or rnd_rem_leave >10:
                 rnd_rem_leave = np.random.normal(loc=rnd_party[0].rem_leave, scale=rnd_party[0].scale_rl)
-            print("Generating voter from " + rnd_party[0].name + " with lib-auth=" + str(rnd_lib_auth) + ", left-right=" + str(rnd_left_right) + " & rem-leave= " + str(rnd_rem_leave))
             self.voters.append(
                 Voter(name=str(i),
                       lib_auth=rnd_lib_auth,

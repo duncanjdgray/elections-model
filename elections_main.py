@@ -6,6 +6,7 @@ from elections_maps import *
 from elections_inputs import *
 
 # %% import source data
+print("Importing source data...")
 data_popn_by_ward = pd.DataFrame(pd.read_csv("data/data_popn_by_ward.csv")).apply(lambda x: x.astype(str).str.lower())
 data_eu_ref_by_con = pd.DataFrame(pd.read_csv("data/data_eu_ref_by_con.csv")).apply(lambda x: x.astype(str).str.lower())
 ge_results_2019_wide = pd.DataFrame(pd.read_excel(
@@ -27,6 +28,7 @@ ge_results_2019_long = pd.wide_to_long(df=ge_results_2019_long,
                                         suffix=r'\w+')
 
 # %% create Areas
+print("Initialising areas...")
 uk = ec.Country("united kingdom",0)
 
 dict_nations = dict()
@@ -50,6 +52,7 @@ for ward in list_ward:
     dict_wards[ward].parent.append_children(dict_wards[ward])
 
 # %% add populations
+print("Adding population data to areas...")
 voting_ages = [str(x) for x in range(min_voter_age,90)]
 voting_ages.append('90+')
 data_popn_by_ward['voting_popn'] = data_popn_by_ward[voting_ages].apply(pd.to_numeric).sum(axis=1)
@@ -60,6 +63,10 @@ for ward in dict_wards.values():
         ward.population = dict_ward_popn[ward.name]
     except KeyError:
         ward.population = data_popn_by_ward['voting_popn'].mean()
+
+# scale populations down by a scale factor to make voter sizes tractable
+for ward in dict_wards.values():
+    ward.population /= population_scale_factor
 
 for con in dict_constituencies.values():
     con.get_pop_from_children()
@@ -73,7 +80,7 @@ for nation in dict_nations.values():
 uk.get_pop_from_children()
 
 # %% add historic voteshares
-
+print("Generating historic voteshares...")
 # for each party in each constituency, get historic share. if con not found ('birmingham, selly oak'), use national shares. If NaN found, set to 0
 for con in dict_constituencies.values():
     for party in con.parties:
@@ -97,12 +104,21 @@ for la in dict_localauthorities.values():
 for nation in dict_nations.values():
     nation.get_local_votes_from_children()
 
-uk.get_local_votes_from_children()
-
 
 # %% generate voters
 # example code:
 # dict_constituencies["ynys mon"].create_voters(list(dict_constituencies["ynys mon"].local_voteshares.keys()),list(dict_constituencies["ynys mon"].local_voteshares.values()))
+print("Generating voters in constituencies...")
+progress = 0
+i = 0
+for con in dict_constituencies.values():
+    i += 1
+    if i >= len(dict_constituencies)/10:
+        i = 0
+        progress += 0.1
+        print("    " + str(round(progress * 100)) + "% of areas completed...")
+    con.create_voters(list(con.local_voteshares.keys()),list(con.local_voteshares.values()))
+print("    100% of areas completed.")
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
