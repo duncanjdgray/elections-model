@@ -408,13 +408,13 @@ class Voter(Actor):
         self.tactical = tactical
 
     def __repr__(self):
-        return """Name: {name}, lives in {location}.
+        return """Voter: {name}, lives in {location}. 
     Lib-Auth: {lib_auth}, Left-Right: {left_right}, Remain-Leave: {rem_leave}, Priority: {priority_axis}""".format(
             name=self.name, 
-            location = self.location.name,
-            lib_auth=self.lib_auth, 
-            left_right=self.left_right,
-            rem_leave = self.rem_leave, 
+            location=self.location.name,
+            lib_auth=round(self.lib_auth, 2), 
+            left_right=round(self.left_right, 2),
+            rem_leave=round(self.rem_leave, 2), 
             priority_axis=map_priority_axes[self.priority_axis])
 
     @property
@@ -456,22 +456,22 @@ class Voter(Actor):
         for party in list_parties:
             if self.priority_axis == 0:
                 self.parties_dist.append( \
-                    ((party).name, \
+                    (party, \
                     math.sqrt( \
                         (self.lib_auth - (party).lib_auth)**2 + 
                         (self.left_right - (party).left_right)**2 +
                         (self.rem_leave - (party).rem_leave)**2)))
             elif self.priority_axis == 1:
                 self.parties_dist.append( \
-                    ((party).name, \
+                    (party, \
                     abs(self.left_right - (party).left_right)))
             elif self.priority_axis == 2:
                 self.parties_dist.append( \
-                    ((party).name, \
+                    (party, \
                     abs(self.lib_auth - (party).lib_auth)))
             elif self.priority_axis == 3:
                 self.parties_dist.append( \
-                    ((party).name, \
+                    (party, \
                     abs(self.rem_leave - (party).rem_leave)))
 
     def order_parties(self):
@@ -479,7 +479,16 @@ class Voter(Actor):
 
     def vote(self, system):
         if system == "FPTP":
-            self.vote_cast = self.ordered_parties[0][0] # vote for nearest party
-            # todo: allow tactical voting?
+            voting_order = self.ordered_parties
+            
+            if self.tactical:
+                tactical_parties = pd.DataFrame.from_dict(self.location.local_voteshares, orient='index')
+                tactical_parties.reset_index(level=0, inplace=True)
+                tactical_parties.sort_values(by=[0], ascending=False, inplace=True)
+                tactical_parties.drop(index=tactical_parties.index[2:], axis=0, inplace=True)
+                voting_order = [i for i in self.ordered_parties if (i[0] in tactical_parties['index'].values)]
+
+            self.vote_cast = voting_order[0][0]     # vote for nearest party
+        
         else:
             raise ValueError("system not set to recognised value. Recognised values are: FPTP")
