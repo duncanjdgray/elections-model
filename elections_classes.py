@@ -30,20 +30,13 @@ class Area:
         self.local_voteshares = dict()
         self.local_votecounts = dict()
 
-    def __str__(self):
+    def __repr__(self):
         return """Area: {name}, Population: {population}, Voters: {voters}
         Parties: {parties}""".format(
             name=self.name, 
             population=self.population, 
             voters=len(self.voters),
             parties=[x.name for x in self.parties])
-
-    def __repr__(self):
-        return 'Area(\'{name}\', {population}, {parties}, {turnout})'.format(
-            name=self.name, 
-            population=self.population, 
-            parties=self.parties,
-            turnout=self.turnout)
 
     @property
     def population(self):
@@ -180,7 +173,6 @@ class Area:
         if self.children != []:
             for child in self.children:
                 for party in self.parties:
-                    print('Trying to load in ' + child[0].name + ' votes for ' + party.name)
                     if party in self.local_votecounts.keys():
                         self.local_votecounts[party] += child[0].local_votecounts[party]
                     else:
@@ -200,7 +192,7 @@ class Country(Area):
     def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
-    def __str__(self):
+    def __repr__(self):
         return """Country: {name}, Population: {population}, Turnout: {turnout}%, 
         Parties: {parties}""".format(
             name=self.name, 
@@ -208,20 +200,13 @@ class Country(Area):
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
-    def __repr__(self):
-        return 'Country(\'{name}\', {population}, {parties}, {turnout})'.format(
-            name=self.name, 
-            population=self.population, 
-            parties=self.parties, 
-            turnout=self.turnout)
-
 class Nation(Area):
     # todo: write docstrings
 
     def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
-    def __str__(self):
+    def __repr__(self):
         return """Nation: {name}, part of {country}. 
         Population: {population}, Turnout: {turnout}%, 
         Parties: {parties}""".format(
@@ -231,22 +216,13 @@ class Nation(Area):
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
-    def __repr__(self):
-        return 'Nation(\'{name}\', {population}, {parent}, {children}, , {parties}, {turnout})'.format(
-            name=self.name, 
-            population=self.population, 
-            parent=self.parent,
-            children = self.children,
-            parties=self.parties, 
-            turnout=self.turnout)
-
 class LocalAuthority(Area):
     # todo: write docstrings
     
     def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
-    def __str__(self):
+    def __repr__(self):
         return """Local Authority: {name}, part of {nation}.
         Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
@@ -255,22 +231,13 @@ class LocalAuthority(Area):
             turnout=self.turnout*100, 
             voters=len(self.voters))
 
-    def __repr__(self):
-        return 'LocalAuthority(\'{name}\', {population}, {parent}, {children}, {parties}, {turnout})'.format(
-            name=self.name, 
-            population=self.population, 
-            parent=self.parent,
-            children=self.children, 
-            parties=self.parties,
-            turnout=self.turnout)
-
 class Constituency(Area):
     # todo: write docstrings
 
     def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
-    def __str__(self):
+    def __repr__(self):
         return """Constituency: {name}, part of the {localauthority} local authority. 
         Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
@@ -279,22 +246,13 @@ class Constituency(Area):
             turnout=self.turnout*100, 
             voters=len(self.voters))
 
-    def __repr__(self):
-        return 'Constituency(\'{name}\', {population}, {parent}, {children}, {parties}, {turnout})'.format(
-            name=self.name, 
-            population=self.population, 
-            parent=self.parent,
-            children=self.children,
-            parties=self.parties,
-            turnout=self.turnout)
-
 class Ward(Area):
     # todo: write docstrings
 
     def __init__(self, name, population, parent=None, children=None, parties=None, turnout=1):
         Area.__init__(self, name, population, parent, children, parties, turnout)
 
-    def __str__(self):
+    def __repr__(self):
         return """Ward: {name}, part of the {constituency} constituency. 
         Population: {population}, Turnout: {turnout}%, Voters: {voters}""".format(
             name=self.name, 
@@ -302,15 +260,6 @@ class Ward(Area):
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
-
-    def __repr__(self):
-        return 'Ward(\'{name}\', {population}, {parent}, {children}, {parties}, {turnout})'.format(
-            name=self.name, 
-            population=self.population, 
-            parent=self.parent,
-            children=self.children, 
-            parties=self.parties,
-            turnout=self.turnout)
 
 # %% Actor-based classes
 class Actor:
@@ -383,12 +332,8 @@ class Party(Actor):
         self.scale_rl = scale_rl
 
     def __repr__(self):
-        return """Party: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, Remain-Leave: {rem_leave}, Vote share: {voteshare}%""".format(
-                name=self.name, 
-                lib_auth=self.lib_auth, 
-                left_right=self.left_right, 
-                rem_leave = self.rem_leave, 
-                voteshare=self.voteshare*100)
+        return """Party: {name}""".format(
+                name=self.name)
     
     @property
     def voteshare(self):
