@@ -6,6 +6,9 @@ min_voter_age = 18
 # scale factor to reduce population to tractable size
 population_scale_factor = 50
 
+# tactical voting factor
+tactical_voting_factor = 0.2
+
 # initialise parties using data from https://www.politicalcompass.org/uk2019 plus some guesswork for rem/leave and northern ireland
 # scale factors represent how broad a church the party is on that axis - higher = broader. 
 p_con = ec.Party(name="Conservatives", 

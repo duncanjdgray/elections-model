@@ -26,7 +26,7 @@ class Area:
             self.parties = parties
         self.votes = []
         self.voters = []
-        self.winner = []
+        self.winners = []
         self.local_voteshares = dict()
         self.local_votecounts = dict()
 
@@ -101,6 +101,7 @@ class Area:
             raise ValueError("turnout must be between 0 and 1 inclusive!")
 
     def create_voters(self, parties, voteshares):
+        from elections_inputs import tactical_voting_factor
         self.voters = []
         for i in range(0, round(self.population * self.turnout)):
             rnd_party = rnd.choices(parties, voteshares, k=1)
@@ -113,10 +114,12 @@ class Area:
                 rnd_rem_leave = np.random.normal(loc=rnd_party[0].rem_leave, scale=rnd_party[0].scale_rl)
             self.voters.append(
                 Voter(name=str(i),
+                      location=self,
                       lib_auth=rnd_lib_auth,
                       left_right=rnd_left_right,
                       rem_leave=rnd_rem_leave,
-                      priority_axis=rnd.choices([0,1,2,3],[10,1,2,2],k=1)[0]))      # most voters care about all axes, some prioritise one, but fewer prioritise lib-auth than left-right or rem-leave
+                      priority_axis=rnd.choices([0,1,2,3],[10,1,2,2],k=1)[0],
+                      tactical=rnd.choices([True,False],[tactical_voting_factor, 1-tactical_voting_factor])[0]))      # most voters care about all axes, some prioritise one, but fewer prioritise lib-auth than left-right or rem-leave
 
     def print_voters(self):
         for i in self.voters:
@@ -139,14 +142,14 @@ class Area:
             self.votes = [(x,self.votes.count(x)) for x in set(self.votes)]
             self._votes_sorted = sorted(self.votes, reverse=True, key=lambda tup: tup[1])
         else:
-            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+            raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
 
     def decide_winner(self, system):
         if system == "FPTP":
-            self.winner = self._votes_sorted[0][0]
+            self.winners = self._votes_sorted[0][0]
             # todo: account for ties
         else:
-            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+            raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
 
     def declare_winner(self, system):
         self.decide_winner(system)
@@ -155,14 +158,20 @@ class Area:
                     " votes, beating the next closest party " + self._votes_sorted[1][0] + " which got " + \
                     str(self._votes_sorted[1][1]) + " votes.")
         else:
-            raise ValueError("system not set to recognised value. Recognised values are: FPTP")
+            raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
 
-    def call_election(self, list_parties, system):
-        self.create_voters(list_parties)
-        self.gen_voter_prefs(list_parties)
-        self.cast_votes(system)
-        self.tally_votes(system)
-        self.decide_winner(system)
+    def call_election(self, system):
+        if system == "FPTP":
+            self.call_election_fptp()
+        else:
+            raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
+
+    def call_election_fptp(self):
+            self.create_voters(list(self.local_voteshares.keys()),list(self.local_voteshares.values()))
+            self.gen_voter_prefs(list(self.local_voteshares.keys()))
+            self.cast_votes("FPTP")
+            self.tally_votes("FPTP")
+            self.decide_winner("FPTP")
 
     def get_local_votes_from_parent(self):
         self.local_voteshares = self.parent.local_voteshares
@@ -389,28 +398,24 @@ class Voter(Actor):
     """
         priority_axis will force voter to only care about one axis. check map_priority_axes for details
     """
-    def __init__(self, name, lib_auth=0, left_right=0, rem_leave=0, priority_axis=0):
+    def __init__(self, name, location, lib_auth=0, left_right=0, rem_leave=0, priority_axis=0, tactical=False):
         Actor.__init__(self, name, lib_auth, left_right, rem_leave)
+        self.location = location
         self.priority_axis = priority_axis
         self.parties_dist = []
         self.ordered_parties = []
         self.vote_cast = []
+        self.tactical = tactical
 
-    def __str__(self):
-        return """Name: {name}, Lib-Auth: {lib_auth}, Left-Right: {left_right}, Remain-Leave: {rem_leave}, Priority: {priority_axis}""".format(
+    def __repr__(self):
+        return """Name: {name}, lives in {location}.
+    Lib-Auth: {lib_auth}, Left-Right: {left_right}, Remain-Leave: {rem_leave}, Priority: {priority_axis}""".format(
             name=self.name, 
+            location = self.location.name,
             lib_auth=self.lib_auth, 
             left_right=self.left_right,
             rem_leave = self.rem_leave, 
             priority_axis=map_priority_axes[self.priority_axis])
-
-    def __repr__(self):
-        return 'Actor(\'{name}\', {lib_auth}, {left_right}, {rem_leave}, {priority_axis})'.format(
-            name=self.name, 
-            lib_auth=self.lib_auth, 
-            left_right=self.left_right, 
-            rem_leave=self.rem_leave,
-            priority_axis=self.priority_axis)
 
     @property
     def priority_axis(self):
@@ -423,6 +428,28 @@ class Voter(Actor):
             self.priority_axis_readable = map_priority_axes[priority_axis]
         else:
             raise ValueError("priority_axis can only have values from " + map_priority_axes.keys())
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, location):
+        if isinstance(location, Area):
+            self._location = location
+        else:
+            raise TypeError("location must be an Area-type object!")
+
+    @property
+    def tactical(self):
+        return self._tactical
+
+    @tactical.setter
+    def tactical(self, tactical):
+        if tactical == True or tactical == False:
+            self._tactical = tactical
+        else:
+            raise TypeError("tactical must be True or False!")
 
     def gen_parties_dist(self, list_parties):
         self.parties_dist = []            # Empty existing list
@@ -446,7 +473,6 @@ class Voter(Actor):
                 self.parties_dist.append( \
                     ((party).name, \
                     abs(self.rem_leave - (party).rem_leave)))
-            
 
     def order_parties(self):
         self.ordered_parties = sorted(self.parties_dist, key=lambda tup: tup[1])
