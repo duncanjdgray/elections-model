@@ -62,23 +62,15 @@ for ward in dict_wards.values():
         ward.population = data_popn_by_ward['voting_popn'].mean()
 
 for con in dict_constituencies.values():
-    con.population = 0
-    for ward in con.children:
-        con.population += ward[0].population
+    con.get_pop_from_children()
 
 for la in dict_localauthorities.values():
-    la.population = 0
-    for con in la.children:
-        la.population += con[0].population
+    la.get_pop_from_children()
 
 for nation in dict_nations.values():
-    nation.population = 0
-    for la in nation.children:
-        nation.population += la[0].population
+    nation.get_pop_from_children()
 
-uk.population = 0
-for nation in uk.children:
-    uk.population += nation[0].population
+uk.get_pop_from_children()
 
 # %% add historic voteshares
 
@@ -103,8 +95,9 @@ for la in dict_localauthorities.values():
     la.get_local_votes_from_children()
 
 for nation in dict_nations.values():
-    print(nation.name + " getting votes from children")
     nation.get_local_votes_from_children()
+
+uk.get_local_votes_from_children()
 
 
 # %% generate voters

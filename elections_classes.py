@@ -169,6 +169,11 @@ class Area:
         self.local_voteshares = self.parent.local_voteshares
         self.local_votecounts = self.parent.local_votecounts
 
+    def get_pop_from_children(self):
+        self.population = 0
+        for child in self.children:
+            self.population += child[0].population
+
     def get_local_votes_from_children(self):
         if self.children != []:
             for child in self.children:
