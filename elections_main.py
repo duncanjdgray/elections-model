@@ -120,6 +120,9 @@ for con in dict_constituencies.values():
     con.create_voters(list(con.local_voteshares.keys()),list(con.local_voteshares.values()))
 print("    100% of areas completed.")
 
+# %% call elections
+
+
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
 # done in inputs - Define national lists of parties (lists in _maps.py)

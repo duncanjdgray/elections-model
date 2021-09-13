@@ -166,12 +166,14 @@ class Area:
         else:
             raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
 
-    def call_election_fptp(self):
+    def call_election_fptp(self, declare_winners=False):
             self.create_voters(list(self.local_voteshares.keys()),list(self.local_voteshares.values()))
             self.gen_voter_prefs(list(self.local_voteshares.keys()))
             self.cast_votes("FPTP")
             self.tally_votes("FPTP")
             self.decide_winner("FPTP")
+            if declare_winners:
+                self.declare_winner("FPTP")
 
     def get_local_votes_from_parent(self):
         self.local_voteshares = self.parent.local_voteshares
@@ -213,6 +215,18 @@ class Country(Area):
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
+    def call_election_fptp(self, declare_winners=False):
+        for child in self.children:
+            child.call_election_fptp()
+            self.winners.append(child.winners)
+        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
+        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
+        if declare_winners:
+            print("The result of the election in " + self.name + " is:\n")
+            print(self._winners_count_sorted)
+            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
+                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + int(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
+
 class Nation(Area):
     # todo: write docstrings
 
@@ -229,6 +243,18 @@ class Nation(Area):
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
+    def call_election_fptp(self, declare_winners=False):
+        for child in self.children:
+            child.call_election_fptp()
+            self.winners.append(child.winners)
+        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
+        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
+        if declare_winners:
+            print("The result of the election in " + self.name + " is:\n")
+            print(self._winners_count_sorted)
+            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
+                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + int(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
+
 class LocalAuthority(Area):
     # todo: write docstrings
     
@@ -243,6 +269,18 @@ class LocalAuthority(Area):
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
+
+    def call_election_fptp(self, declare_winners=False):
+        for child in self.children:
+            child.call_election_fptp()
+            self.winners.append(child.winners)
+        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
+        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
+        if declare_winners:
+            print("The result of the election in " + self.name + " is:\n")
+            print(self._winners_count_sorted)
+            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
+                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + int(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
 
 class Constituency(Area):
     # todo: write docstrings
@@ -273,6 +311,9 @@ class Ward(Area):
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
+
+    def call_election_fptp(self):
+        raise TypeError("FPTP elections cannot be called at the ward level!")
 
 # %% Actor-based classes
 class Actor:
