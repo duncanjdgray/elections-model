@@ -135,6 +135,8 @@ print("Generating voters in constituencies...")
 
 # country - uk
 uk.call_election("FPTP", True)
+# bugs seem to relate to data types of counting up results - whether they are Parties, lists of Parties, lists of lists of Parties, etc.
+# at the nat'l level - error when running england
 
 # Order of precedence:
 # done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)

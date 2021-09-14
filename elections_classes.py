@@ -45,7 +45,7 @@ class Area:
     @population.setter
     def population(self, population):
         if population >= 0:
-            self._population = population
+            self._population = int(round(population))
         else:
             raise ValueError("population cannot be negative!")
 
@@ -146,7 +146,7 @@ class Area:
 
     def decide_winner(self, system):
         if system == "FPTP":
-            self.winners = self._votes_sorted[0][0]
+            self.winners = [self._votes_sorted[0][0]]
             # todo: account for ties
         else:
             raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
@@ -167,13 +167,22 @@ class Area:
             raise ValueError("system not set to recognised value. Recognised values are: 'FPTP'")
 
     def call_election_fptp(self, declare_winners=False):
-            self.create_voters(list(self.local_voteshares.keys()),list(self.local_voteshares.values()))
-            self.gen_voter_prefs(list(self.local_voteshares.keys()))
-            self.cast_votes("FPTP")
-            self.tally_votes("FPTP")
-            self.decide_winner("FPTP")
-            if declare_winners:
-                self.declare_winner("FPTP")
+        for child in self.children:
+            print("Running elections for: " + child[0].name)
+            child[0].call_election_fptp()
+            for party in child[0].winners:
+                self.winners.append(party)
+        # unpack list of lists to be flat list
+        self.winners = list(np.asarray(self.winners, dtype=object).flatten())
+        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
+        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
+        if declare_winners:
+            print("The result of the election in " + self.name + " is:\n")
+            print(*self._winners_count_sorted, sep='\n')
+            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
+                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + str(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
+            else:
+                print("There is no overall majority.")
 
     def get_local_votes_from_parent(self):
         self.local_voteshares = self.parent.local_voteshares
@@ -218,23 +227,6 @@ class Country(Area):
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
-    def call_election_fptp(self, declare_winners=False):
-        for child in self.children:
-            print("Running elections for nation: " + child[0].name)
-            child[0].call_election_fptp()
-            self.winners.append(child[0].winners)
-        # unpack list of list of lists to flat list
-        self.winners = list(np.asarray(self.winners).flatten())
-        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
-        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
-        if declare_winners:
-            print("The result of the election in " + self.name + " is:\n")
-            print(*self._winners_count_sorted, sep='\n')
-            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
-                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + str(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
-            else:
-                print("There is no overall majority.")
-
 class Nation(Area):
     # todo: write docstrings
 
@@ -251,23 +243,6 @@ class Nation(Area):
             turnout=self.turnout*100, 
             parties=[x.name for x in self.parties])
 
-    def call_election_fptp(self, declare_winners=False):
-        for child in self.children:
-            print("Running elections for local authority: " + child[0].name)
-            child[0].call_election_fptp()
-            self.winners.append(child[0].winners)
-        # unpack list of lists to be flat list
-        self.winners = list(np.asarray(self.winners).flatten())
-        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
-        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
-        if declare_winners:
-            print("The result of the election in " + self.name + " is:\n")
-            print(*self._winners_count_sorted, sep='\n')
-            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
-                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + str(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
-            else:
-                print("There is no overall majority.")
-
 class LocalAuthority(Area):
     # todo: write docstrings
     
@@ -283,22 +258,6 @@ class LocalAuthority(Area):
             turnout=self.turnout*100, 
             voters=len(self.voters))
 
-    def call_election_fptp(self, declare_winners=False):
-        for child in self.children:
-            print("Running election for constituency: " + child[0].name)
-            child[0].call_election_fptp()
-            self.winners.append(child[0].winners)
-        self.winners = list(np.asarray(self.winners).flatten())
-        self.winners_count = [(x,self.winners.count(x)) for x in set(self.winners)]
-        self._winners_count_sorted = sorted(self.winners_count, reverse=True, key=lambda tup: tup[1])
-        if declare_winners:
-            print("The result of the election in " + self.name + " is:")
-            print(*self._winners_count_sorted, sep='\n')
-            if int(self._winners_count_sorted[0][1]) > sum(x for _,x in self._winners_count_sorted)/2:
-                print(self._winners_count_sorted[0][0].name + " has won an overall majority with " + str(self._winners_count_sorted[0][1]) + " out of " + str(sum(x for _,x in self._winners_count_sorted)) + " total seats.")
-            else:
-                print("There is no overall majority.")
-
 class Constituency(Area):
     # todo: write docstrings
 
@@ -313,6 +272,15 @@ class Constituency(Area):
             population=self.population, 
             turnout=self.turnout*100, 
             voters=len(self.voters))
+
+    def call_election_fptp(self, declare_winners=False):
+            self.create_voters(list(self.local_voteshares.keys()),list(self.local_voteshares.values()))
+            self.gen_voter_prefs(list(self.local_voteshares.keys()))
+            self.cast_votes("FPTP")
+            self.tally_votes("FPTP")
+            self.decide_winner("FPTP")
+            if declare_winners:
+                self.declare_winner("FPTP")
 
 class Ward(Area):
     # todo: write docstrings
