@@ -4,60 +4,60 @@ import elections_classes as ec
 min_voter_age = 18
 
 # scale factor to reduce population to tractable size
-population_scale_factor = 250
+population_scale_factor = 100
 
 # tactical voting factor
-tactical_voting_factor = 0.2
+tactical_voting_factor = 0.4
 
 # initialise parties using data from https://www.politicalcompass.org/uk2019 plus some guesswork for rem/leave and northern ireland
 # scale factors represent how broad a church the party is on that axis - higher = broader. 
 p_con = ec.Party(name="Conservatives", 
                 lib_auth= 7, 
-                scale_la= 3,
+                scale_la= 2,
                 left_right= 9.5, 
-                scale_lr= 3,
+                scale_lr= 2,
                 rem_leave= 9,
-                scale_rl= 3)
+                scale_rl= 2)
 p_lab = ec.Party(name="Labour", 
                 lib_auth= -1.5, 
-                scale_la= 3,
+                scale_la= 2,
                 left_right= -4.5, 
                 scale_lr= 2,
                 rem_leave= -3,
                 scale_rl= 2)
 p_lib = ec.Party(name="Liberal Democrats", 
                 lib_auth= 2.5, 
-                scale_la= 1.5,
+                scale_la= 1.2,
                 left_right= 4, 
-                scale_lr= 2,
+                scale_lr= 1.5,
                 rem_leave= -10,
                 scale_rl= 1)
 p_grn = ec.Party(name="Greens", 
                 lib_auth= -5, 
-                scale_la= 1.5,
+                scale_la= 1,
                 left_right= -3, 
-                scale_lr= 1.5,
+                scale_lr= 1,
                 rem_leave= -8,
                 scale_rl= 1)
 p_bxp = ec.Party(name="Brexit", 
                 lib_auth= 8, 
-                scale_la= 1.5,
+                scale_la= 1,
                 left_right= 8.5, 
-                scale_lr= 1.5,
+                scale_lr= 1,
                 rem_leave= 10,
                 scale_rl= 1)
 p_snp = ec.Party(name="Scottish Nationals", 
                 lib_auth= -1, 
-                scale_la= 3,
+                scale_la= 2,
                 left_right= -2, 
-                scale_lr= 1.5,
+                scale_lr= 1,
                 rem_leave= -6,
-                scale_rl= 2)
+                scale_rl= 1.5)
 p_plaid = ec.Party(name="Plaid Cymru", 
                 lib_auth= -1, 
-                scale_la= 1.5,
+                scale_la= 1.2,
                 left_right= -1, 
-                scale_lr= 1.5,
+                scale_lr= 1.2,
                 rem_leave= -6,
                 scale_rl= 2)
 p_dup = ec.Party(name="Democratic Unionists", 

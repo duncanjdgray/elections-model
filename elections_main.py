@@ -135,28 +135,9 @@ print("Generating voters in constituencies...")
 
 # country - uk
 uk.call_election("FPTP", True)
-# bugs seem to relate to data types of counting up results - whether they are Parties, lists of Parties, lists of lists of Parties, etc.
-# at the nat'l level - error when running england
 
-# Order of precedence:
-# done in inputs - Initialise each party with national properties (lib_auth etc, vote share for countries where it operates, std devs of lib_auth etc)
-# done in inputs - Define national lists of parties (lists in _maps.py)
-# done - Create countries, for each country give it a subset of all parties
-# done - For each country, create a set of LAs
-# done - For each LA, create a set of Cons
-# done - For each Cons, create a set of Wards
-# done -  Give each Ward a population
-# done - For each Cons, sum its Wards' popn
-# done - Repeat for LAs and Countries
-# done - Give each Cons a historic voteshare for each of its parties
-# done - For each Ward, take its Cons' historic voteshare
-# done - For each LA, take a popn-based weighted average of each of its Cons' voteshares
-# done - For each Country, the same
-# done - now we have a set of countries, their LAs, their cons, and their wards, each with a popn, a set of parties, and those parties' historic vote shares (or nat'l averages where no data available)
-# todo: add a check - compare newly calculated country vote shares to input average vote shares - are we close?
-# todo: can now run a national election under FPTP?
-
-# useful techniques
-# [x for x in list if x.property == condition]
-# e.g. [x for x in wards if x.cons == specific_consituency]
-# looking in a multiindexed df requires .loc[]
+##############################
+# todo: output to map-compatible format for Tableau
+# todo: add adjustment for new polling
+# todo: add new level of area - PR-compatible large constituencies
+# todo: add new voting system
