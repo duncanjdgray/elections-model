@@ -7,28 +7,28 @@ min_voter_age = 18
 population_scale_factor = 100
 
 # tactical voting factor
-tactical_voting_factor = 0.4
+tactical_voting_factor = 0.3
 
 # initialise parties using data from https://www.politicalcompass.org/uk2019 plus some guesswork for rem/leave and northern ireland
 # scale factors represent how broad a church the party is on that axis - higher = broader. 
 p_con = ec.Party(name="Conservatives", 
                 lib_auth= 7, 
-                scale_la= 2,
-                left_right= 9.5, 
-                scale_lr= 2,
+                scale_la= 3,
+                left_right= 8, 
+                scale_lr= 3,
                 rem_leave= 9,
-                scale_rl= 2)
+                scale_rl= 1.8)
 p_lab = ec.Party(name="Labour", 
-                lib_auth= -1.5, 
-                scale_la= 2,
-                left_right= -4.5, 
-                scale_lr= 2,
-                rem_leave= -3,
-                scale_rl= 2)
+                lib_auth= 1, 
+                scale_la= 3,
+                left_right= -5, 
+                scale_lr= 3,
+                rem_leave= -4,
+                scale_rl= 1.8)
 p_lib = ec.Party(name="Liberal Democrats", 
-                lib_auth= 2.5, 
+                lib_auth= -5, 
                 scale_la= 1.2,
-                left_right= 4, 
+                left_right= 1.8, 
                 scale_lr= 1.5,
                 rem_leave= -10,
                 scale_rl= 1)
@@ -42,7 +42,7 @@ p_grn = ec.Party(name="Greens",
 p_bxp = ec.Party(name="Brexit", 
                 lib_auth= 8, 
                 scale_la= 1,
-                left_right= 8.5, 
+                left_right= 10, 
                 scale_lr= 1,
                 rem_leave= 10,
                 scale_rl= 1)
